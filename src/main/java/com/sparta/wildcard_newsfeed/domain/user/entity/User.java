@@ -1,9 +1,7 @@
 package com.sparta.wildcard_newsfeed.domain.user.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -20,8 +18,19 @@ public class User {
     private String name;
     private String email;
     private String introduce;
+    @Setter
     private String refreshToken;
     @Enumerated(EnumType.STRING)
     private UserStatusEnum userStatus;
     private LocalDateTime authUserAt;
+
+    @Enumerated(EnumType.STRING)
+    private UserRoleEnum userRoleEnum;
+
+    @Builder
+    public User(String usercode, String password, UserRoleEnum userRoleEnum) {
+        this.usercode = usercode;
+        this.password = password;
+        this.userRoleEnum = userRoleEnum;
+    }
 }
