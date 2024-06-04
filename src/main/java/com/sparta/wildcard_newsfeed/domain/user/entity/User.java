@@ -3,10 +3,7 @@ package com.sparta.wildcard_newsfeed.domain.user.entity;
 import com.sparta.wildcard_newsfeed.domain.common.TimeStampEntity;
 import com.sparta.wildcard_newsfeed.domain.user.dto.UserSignupRequestDto;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -23,10 +20,21 @@ public class User extends TimeStampEntity {
     private String name; // 이름
     private String email;
     private String introduce;
+    @Setter
     private String refreshToken;
     @Enumerated(EnumType.STRING)
     private UserStatusEnum userStatus; //회원상태코드
-    private LocalDateTime authUserAt; // 상태 변경 시간
+    private LocalDateTime authUserAt; //상태 변경 시간
+
+    @Enumerated(EnumType.STRING)
+    private UserRoleEnum userRoleEnum;
+
+    @Builder
+    public User(String usercode, String password, UserRoleEnum userRoleEnum) {
+        this.usercode = usercode;
+        this.password = password;
+        this.userRoleEnum = userRoleEnum;
+    }
 
     /** 가입 시 사용 **/
     public User(String usercode, String password){
