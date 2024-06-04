@@ -1,11 +1,13 @@
 # Default ignored files
 /shelf/
-/workspace.xml
+/.idea/workspace.xml
 # Editor-based HTTP Client requests
 /httpRequests/
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
+
+.gradle/**
 
 # Created by https://www.toptal.com/developers/gitignore/api/java,intellij,intellij+iml,intellij+all,macos,windows
 # Edit at https://www.toptal.com/developers/gitignore?templates=java,intellij,intellij+iml,intellij+all,macos,windows
