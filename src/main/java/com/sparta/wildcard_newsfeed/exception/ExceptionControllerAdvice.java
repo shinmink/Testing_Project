@@ -27,18 +27,6 @@ public class ExceptionControllerAdvice {
                         .build());
     }
 
-//    @ExceptionHandler(TokenNotFoundException.class)
-//    public ResponseEntity<ErrorResponseDto> tokenNotFoundException(TokenNotFoundException e) {
-//        log.error("Token 예외 발생 {} " ,e);
-//        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-//                .body(ErrorResponseDto.builder()
-//                        .statusCode(HttpStatus.NOT_FOUND.value())
-//                        .message(e.getMessage())
-//                        .build()
-//                );
-//    }
-
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> methodArgumentNotValidException(MethodArgumentNotValidException ex) {
         Map<String, Object> responseValid = new LinkedHashMap<>();
