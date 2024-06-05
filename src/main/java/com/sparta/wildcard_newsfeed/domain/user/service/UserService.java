@@ -7,6 +7,7 @@ import com.sparta.wildcard_newsfeed.domain.user.dto.UserSignupResponseDto;
 import com.sparta.wildcard_newsfeed.domain.user.entity.User;
 import com.sparta.wildcard_newsfeed.domain.user.entity.UserStatusEnum;
 import com.sparta.wildcard_newsfeed.domain.user.repository.UserRepository;
+import com.sparta.wildcard_newsfeed.security.AuthenticationUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -61,6 +62,7 @@ public class UserService {
         return null;
     }
 
+    @Transactional(readOnly = true)
     public UserResponseDto findById(Long userId) {
         User findUser = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
@@ -68,14 +70,28 @@ public class UserService {
         return new UserResponseDto(findUser);
     }
 
-    public UserResponseDto updateUser(Long userId, UserRequestDto requestDto) {
+    @Transactional
+    public UserResponseDto updateUser(AuthenticationUser loginUser, Long userId, UserRequestDto requestDto) {
         User findUser = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         if (requestDto.getPassword() != null) {
-            // 로그인한 유저의 비밀번호와 dto의 비밀번호가 일치하지 않을 때
-
-            // 현재 비밀번호와 변경하려는 비밀번호와 똑같을 때
+            if (requestDto.getChangePassword() == null) {
+                throw new IllegalArgumentException("변경할 비밀번호을 입력해 주세요.");
+            }
+        }
+        if (requestDto.getChangePassword() != null) {
+            if (requestDto.getPassword() == null) {
+                throw new IllegalArgumentException("현재 비밀번호를 입력해 주세요.");
+            }
+        }
+        if (requestDto.getPassword() != null && requestDto.getChangePassword() != null) {
+            if (!loginUser.getPassword().equals(requestDto.getPassword()) || !findUser.getPassword().equals(requestDto.getPassword())) {
+                throw new IllegalArgumentException("사용자가 일치하지 않습니다.");
+            }
+            if (requestDto.getPassword().equals(requestDto.getChangePassword())) {
+                throw new IllegalArgumentException("변경하려는 비밀번호와 현재 비밀번호가 같습니다.");
+            }
         }
 
         findUser.update(requestDto);

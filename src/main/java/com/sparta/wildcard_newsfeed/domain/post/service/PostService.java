@@ -5,10 +5,7 @@ import com.sparta.wildcard_newsfeed.domain.post.dto.PostResponseDto;
 import com.sparta.wildcard_newsfeed.domain.post.entity.Post;
 import com.sparta.wildcard_newsfeed.domain.post.repository.PostRepository;
 import com.sparta.wildcard_newsfeed.domain.user.entity.User;
-import com.sparta.wildcard_newsfeed.domain.user.repository.UserRepository;
-import com.sparta.wildcard_newsfeed.security.jwt.JwtUtil;
-import io.jsonwebtoken.Claims;
-import jakarta.servlet.http.HttpServletRequest;
+import com.sparta.wildcard_newsfeed.security.AuthenticationUser;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,8 +20,6 @@ import java.util.List;
 public class PostService {
 
     private final PostRepository postRepository;
-    private final UserRepository userRepository;
-    private final JwtUtil jwtUtil;
 
     @Transactional
     public PostResponseDto addPost(PostRequestDto postRequestDto, User user) {
@@ -46,13 +41,11 @@ public class PostService {
                 .toList();
     }
 
-
     @Transactional
-    public PostResponseDto updatePost(PostRequestDto postRequestDto, Long postId, HttpServletRequest request) {
+    public PostResponseDto updatePost(PostRequestDto postRequestDto, Long postId, AuthenticationUser user) {
         Post post = findPostById(postId);
-        User user = validateTokenAndGetUser(request);
 
-        validateUser(post, user.getId());
+        validateUser(post, user);
 
         post.update(postRequestDto);
         postRepository.save(post);
@@ -60,11 +53,10 @@ public class PostService {
     }
 
     @Transactional
-    public void deletePost(Long postId, HttpServletRequest request) {
+    public void deletePost(Long postId, AuthenticationUser user) {
         Post post = findPostById(postId);
-        User user = validateTokenAndGetUser(request);
 
-        validateUser(post, user.getId());
+        validateUser(post, user);
 
         postRepository.delete(post);
     }
@@ -74,23 +66,9 @@ public class PostService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시물이 존재하지 않습니다."));
     }
 
-    private void validateUser(Post post, Long userId) {
-        if (!post.getUser().getId().equals(userId)) {
+    private void validateUser(Post post, AuthenticationUser user) {
+        if (!post.getUser().getUsercode().equals(user.getUsername())) {
             throw new IllegalArgumentException("작성자만 할 수 있습니다.");
         }
     }
-
-    private User validateTokenAndGetUser(HttpServletRequest request) {
-        String token = jwtUtil.getAccessTokenFromHeader(request);
-        if (token == null || !jwtUtil.validateToken(token)) {
-            throw new SecurityException("유효한 토큰이 아닙니다.");
-        }
-
-        Claims claims = jwtUtil.getUserInfoFromToken(token);
-        String usercode = claims.getSubject();
-
-        return userRepository.findByUsercode(usercode)
-                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자입니다."));
-    }
-
 }
