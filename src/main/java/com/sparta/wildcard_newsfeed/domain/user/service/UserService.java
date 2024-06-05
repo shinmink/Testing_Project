@@ -9,6 +9,7 @@ import com.sparta.wildcard_newsfeed.domain.user.entity.UserStatusEnum;
 import com.sparta.wildcard_newsfeed.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public UserSignupResponseDto signup(UserSignupRequestDto requestDto) {
@@ -29,9 +31,8 @@ public class UserService {
             throw new IllegalArgumentException("중복된 ID로는 회원가입 할 수 없습니다.");
         }
 
-        String pwd = requestDto.getPassword();
+        String pwd = passwordEncoder.encode(requestDto.getPassword());
         //Bcrypt 암호화
-        //passwordEncoder.encode()
 
         User user = userRepository.save(new User(usercode, pwd));
 
@@ -51,10 +52,7 @@ public class UserService {
         if(user.getUserStatus() == UserStatusEnum.DISABLED)
             throw new IllegalArgumentException("이미 탈퇴한 사용자입니다!!");
 
-        String pwd = requestDto.getPassword();
-        //passwordEncoder.encode(
-
-        if(!user.getPassword().equals(pwd)) {
+        if(!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다!!");
         }
 
