@@ -29,22 +29,12 @@ public class Post extends TimeStampEntity {
     private String content;
 
 
-    public Post(Long id, User user, String title, String content) {
-        this.id = id;
-        this.user = user;
-        this.title = title;
-        this.content = content;
-    }
-
     public Post(PostRequestDto postRequestDto, User user) {
         this.user = user;
         this.title = postRequestDto.getTitle();
         this.content = postRequestDto.getContent();
     }
 
-    public Long getUserId() {
-        return getUser().getId();
-    }
 
     public void update(PostRequestDto postRequestDto) {
         this.title = postRequestDto.getTitle();

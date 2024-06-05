@@ -65,7 +65,7 @@ public class PostController {
                 .body(CommonResponseDto.<PostResponseDto>builder()
                         .statusCode(HttpStatus.OK.value())
                         .message("게시물 수정 성공")
-                        //.data(postResponseDto)
+                        .data(postResponseDto)
                         .build());
     }
 

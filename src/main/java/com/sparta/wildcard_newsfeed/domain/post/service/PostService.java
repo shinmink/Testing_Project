@@ -100,6 +100,6 @@ public class PostService {
         validateUser(post, user.getId());
 
         postRepository.delete(post);
-        return PostResponseDto.toDto(post);
+        return null;
     }
 }
