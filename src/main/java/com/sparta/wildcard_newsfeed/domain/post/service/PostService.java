@@ -6,6 +6,7 @@ import com.sparta.wildcard_newsfeed.domain.post.entity.Post;
 import com.sparta.wildcard_newsfeed.domain.post.repository.PostRepository;
 import com.sparta.wildcard_newsfeed.domain.user.entity.User;
 import com.sparta.wildcard_newsfeed.domain.user.repository.UserRepository;
+import com.sparta.wildcard_newsfeed.security.AuthenticationUser;
 import com.sparta.wildcard_newsfeed.security.jwt.JwtUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,8 +28,10 @@ public class PostService {
     private final JwtUtil jwtUtil;
 
     @Transactional
-    public PostResponseDto addPost(PostRequestDto postRequestDto, User user) {
-        Post post = new Post(postRequestDto, user);
+    public PostResponseDto addPost(PostRequestDto postRequestDto, AuthenticationUser user) {
+        User byUsercode = userRepository.findByUsercode(user.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        Post post = new Post(postRequestDto, byUsercode);
         postRepository.save(post);
         return new PostResponseDto(post);
     }
