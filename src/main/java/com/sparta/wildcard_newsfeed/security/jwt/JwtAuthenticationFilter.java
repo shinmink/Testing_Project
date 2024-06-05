@@ -18,11 +18,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 
-import static com.sparta.wildcard_newsfeed.security.jwt.JwtConstants.ACCESS_TOKEN_HEADER;
-import static com.sparta.wildcard_newsfeed.security.jwt.JwtConstants.REFRESH_TOKEN_HEADER;
+import static com.sparta.wildcard_newsfeed.security.jwt.JwtConstants.*;
 
 @Slf4j(topic = "로그인 및 JWT 생성")
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -62,11 +62,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException {
         log.info("로그인 성공 및 JWT 토큰 발행");
-        User user = userRepository.findByUsercode(authResult.getName()).orElseThrow(() ->
-                new UserNotFoundException("해당 유저를 찾을 수 없습니다."));
+        User user = userRepository.findByUsercode(authResult.getName())
+                .orElseThrow(UserNotFoundException::new);
 
         TokenDto tokenDto = jwtUtil.generateAccessTokenAndRefreshToken(user.getUsercode());
-        user.setRefreshToken(tokenDto.getRefreshToken());
+        String refreshTokenValue = tokenDto.getRefreshToken().substring(7);
+        user.setRefreshToken(refreshTokenValue);
         userRepository.save(user);
 
         loginSuccessResponse(response, tokenDto);
