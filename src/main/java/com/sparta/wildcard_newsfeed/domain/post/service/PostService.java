@@ -63,15 +63,11 @@ public class PostService {
 
     private void validateUser(Post post, Long userId) {
         if (!post.getUser().getId().equals(userId)) {
-            throw new IllegalArgumentException("작성자만 삭제할 수 있습니다.");
+            throw new IllegalArgumentException("작성자만 할 수 있습니다.");
         }
     }
 
-    @Transactional
-    public PostResponseDto updatePost(PostRequestDto postRequestDto, Long postId, HttpServletRequest request) {
-        Post post = postRepository.findPostById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
-
+    private User validateTokenAndGetUser(HttpServletRequest request) {
         String token = jwtUtil.getAccessTokenFromHeader(request);
         if (token == null || !jwtUtil.validateToken(token)) {
             throw new SecurityException("유효한 토큰이 아닙니다.");
@@ -80,12 +76,16 @@ public class PostService {
         Claims claims = jwtUtil.getUserInfoFromToken(token);
         String usercode = claims.getSubject();
 
-        User user = userRepository.findByUsercode(usercode)
+        return userRepository.findByUsercode(usercode)
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자입니다."));
+    }
 
-        if (!post.getUser().getId().equals(user.getId())) {
-            throw new SecurityException("작성자 본인만 수정할 수 있습니다.");
-        }
+    @Transactional
+    public PostResponseDto updatePost(PostRequestDto postRequestDto, Long postId, HttpServletRequest request) {
+        Post post = findPostById(postId);
+        User user = validateTokenAndGetUser(request);
+
+        validateUser(post, user.getId());
 
         post.update(postRequestDto);
         postRepository.save(post);
@@ -94,23 +94,10 @@ public class PostService {
 
     @Transactional
     public PostResponseDto deletePost(Long postId, HttpServletRequest request) {
-        Post post = postRepository.findPostById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+        Post post = findPostById(postId);
+        User user = validateTokenAndGetUser(request);
 
-        String token = jwtUtil.getAccessTokenFromHeader(request);
-        if (token == null || !jwtUtil.validateToken(token)) {
-            throw new SecurityException("유효한 토큰이 아닙니다.");
-        }
-
-        Claims claims = jwtUtil.getUserInfoFromToken(token);
-        String usercode = claims.getSubject();
-
-        User user = userRepository.findByUsercode(usercode)
-                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자입니다."));
-
-        if (!post.getUser().getId().equals(user.getId())) {
-            throw new SecurityException("작성자 본인만 삭제할 수 있습니다.");
-        }
+        validateUser(post, user.getId());
 
         postRepository.delete(post);
         return PostResponseDto.toDto(post);
