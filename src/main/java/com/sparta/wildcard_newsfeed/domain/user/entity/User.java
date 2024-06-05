@@ -44,6 +44,7 @@ public class User extends TimeStampEntity {
         //유저 이름의 기본 값은 사용자 ID
         this.userStatus = UserStatusEnum.ENABLED;
         this.authUserAt = LocalDateTime.now();
+        this.userRoleEnum = UserRoleEnum.USER;
         //가입 시 회원상태코드는 정상과 상태 변경 시간 적용
     }
 
