@@ -50,7 +50,6 @@ public class PostController {
         return ResponseEntity.ok(post);
     }
 
-
     //게시물 수정
     @PutMapping("/{postId}")
     public ResponseEntity<CommonResponseDto<PostResponseDto>> updatePost(
@@ -80,5 +79,4 @@ public class PostController {
                         .message("게시물 삭제 성공")
                         .build());
     }
-
 }

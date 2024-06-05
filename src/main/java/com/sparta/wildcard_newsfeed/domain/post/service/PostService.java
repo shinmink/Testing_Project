@@ -41,7 +41,6 @@ public class PostService {
                 .toList();
     }
 
-
     @Transactional
     public PostResponseDto updatePost(PostRequestDto postRequestDto, Long postId, AuthenticationUser user) {
         Post post = findPostById(postId);

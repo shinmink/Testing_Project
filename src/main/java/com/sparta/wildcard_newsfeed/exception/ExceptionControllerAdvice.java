@@ -9,9 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @RestControllerAdvice
@@ -38,14 +36,16 @@ public class ExceptionControllerAdvice {
 //                );
 //    }
 
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> methodArgumentNotValidException(MethodArgumentNotValidException ex) {
-        Map<String, Object> responseValid = new LinkedHashMap<>();
+    public ResponseEntity<ErrorResponseDto> methodArgumentNotValidException(MethodArgumentNotValidException ex) {
         List<String> errorMessageList = new ArrayList<>();
-        responseValid.put("statusCode", HttpStatus.BAD_REQUEST.toString());
         ex.getBindingResult().getAllErrors().forEach(v -> errorMessageList.add(v.getDefaultMessage()));
-        responseValid.put("message", errorMessageList);
-        return ResponseEntity.badRequest().body(responseValid);
+        log.error(errorMessageList.toString());
+
+        return ResponseEntity.badRequest()
+                .body(ErrorResponseDto.builder()
+                        .statusCode(HttpStatus.BAD_REQUEST.value())
+                        .message(errorMessageList)
+                        .build());
     }
 }
