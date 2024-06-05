@@ -4,20 +4,14 @@ import com.sparta.wildcard_newsfeed.domain.common.CommonResponseDto;
 import com.sparta.wildcard_newsfeed.domain.post.dto.PostRequestDto;
 import com.sparta.wildcard_newsfeed.domain.post.dto.PostResponseDto;
 import com.sparta.wildcard_newsfeed.domain.post.service.PostService;
-import com.sparta.wildcard_newsfeed.domain.user.dto.UserRequestDto;
-import com.sparta.wildcard_newsfeed.domain.user.dto.UserResponseDto;
-import com.sparta.wildcard_newsfeed.domain.user.dto.UserSignupRequestDto;
-import com.sparta.wildcard_newsfeed.domain.user.dto.UserSignupResponseDto;
 import com.sparta.wildcard_newsfeed.domain.user.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.http.parser.Authorization;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 
@@ -78,7 +72,7 @@ public class PostController {
                 .body(CommonResponseDto.<PostResponseDto>builder()
                         .statusCode(HttpStatus.OK.value())
                         .message("게시물 삭제 성공")
-                        //.data(postResponseDto)
+                        .data(postResponseDto)
                         .build());
     }
 

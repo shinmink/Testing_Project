@@ -10,6 +10,7 @@ public class PostResponseDto {
     private Long id;
     private String title;
     private String content;
+    //작성자 아이디? 이름?
     private String username;
     private LocalDateTime createAt;
     private LocalDateTime modifiedAt;

@@ -4,28 +4,18 @@ import com.sparta.wildcard_newsfeed.domain.post.dto.PostRequestDto;
 import com.sparta.wildcard_newsfeed.domain.post.dto.PostResponseDto;
 import com.sparta.wildcard_newsfeed.domain.post.entity.Post;
 import com.sparta.wildcard_newsfeed.domain.post.repository.PostRepository;
-import com.sparta.wildcard_newsfeed.domain.user.dto.UserRequestDto;
-import com.sparta.wildcard_newsfeed.domain.user.dto.UserResponseDto;
-import com.sparta.wildcard_newsfeed.domain.user.dto.UserSignupRequestDto;
-import com.sparta.wildcard_newsfeed.domain.user.dto.UserSignupResponseDto;
 import com.sparta.wildcard_newsfeed.domain.user.entity.User;
-import com.sparta.wildcard_newsfeed.domain.user.entity.UserStatusEnum;
 import com.sparta.wildcard_newsfeed.domain.user.repository.UserRepository;
-import com.sparta.wildcard_newsfeed.security.AuthenticationUser;
 import com.sparta.wildcard_newsfeed.security.jwt.JwtUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
-
-import static net.sf.jsqlparser.util.validation.metadata.NamedObject.user;
 
 @Slf4j
 @Service
@@ -77,7 +67,7 @@ public class PostService {
         validateUser(post, user.getId());
 
         postRepository.delete(post);
-        return null;
+        return new PostResponseDto(post);
     }
 
     private Post findPostById(long id) {
