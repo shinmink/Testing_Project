@@ -1,7 +1,8 @@
 package com.sparta.wildcard_newsfeed.domain.user.controller;
 
 import com.sparta.wildcard_newsfeed.domain.common.CommonResponseDto;
-import com.sparta.wildcard_newsfeed.domain.post.dto.PostResponseDto;
+import com.sparta.wildcard_newsfeed.domain.user.dto.UserRequestDto;
+import com.sparta.wildcard_newsfeed.domain.user.dto.UserResponseDto;
 import com.sparta.wildcard_newsfeed.domain.user.dto.UserSignupRequestDto;
 import com.sparta.wildcard_newsfeed.domain.user.dto.UserSignupResponseDto;
 import com.sparta.wildcard_newsfeed.domain.user.service.UserService;
@@ -10,10 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -43,6 +41,33 @@ public class UserController {
                         .statusCode(HttpStatus.OK.value())
                         .message("회원탈퇴 성공")
                         .data(responseDto)
+                        .build());
+    }
+
+    @GetMapping("{userId}")
+    public ResponseEntity<CommonResponseDto<UserResponseDto>> getUser(@PathVariable Long userId) {
+        UserResponseDto userResponseDto = userService.findById(userId);
+
+        return ResponseEntity.ok()
+                .body(CommonResponseDto.<UserResponseDto>builder()
+                        .statusCode(HttpStatus.OK.value())
+                        .message("프로필 조회 성공")
+                        .data(userResponseDto)
+                        .build());
+    }
+
+    @PutMapping("{userId}")
+    public ResponseEntity<CommonResponseDto<UserResponseDto>> updateUser(
+            @PathVariable Long userId,
+            @Valid @RequestBody UserRequestDto requestDto
+    ) {
+        UserResponseDto userResponseDto = userService.updateUser(userId, requestDto);
+
+        return ResponseEntity.ok()
+                .body(CommonResponseDto.<UserResponseDto>builder()
+                        .statusCode(HttpStatus.OK.value())
+                        .message("프로필 수정 성공")
+//                        .data(userResponseDto)
                         .build());
     }
 }

@@ -13,7 +13,6 @@ import org.springframework.util.StringUtils;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 import static com.sparta.wildcard_newsfeed.security.jwt.JwtConstants.*;

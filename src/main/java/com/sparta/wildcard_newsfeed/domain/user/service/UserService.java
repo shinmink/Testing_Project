@@ -1,5 +1,7 @@
 package com.sparta.wildcard_newsfeed.domain.user.service;
 
+import com.sparta.wildcard_newsfeed.domain.user.dto.UserRequestDto;
+import com.sparta.wildcard_newsfeed.domain.user.dto.UserResponseDto;
 import com.sparta.wildcard_newsfeed.domain.user.dto.UserSignupRequestDto;
 import com.sparta.wildcard_newsfeed.domain.user.dto.UserSignupResponseDto;
 import com.sparta.wildcard_newsfeed.domain.user.entity.User;
@@ -59,5 +61,28 @@ public class UserService {
         user.setUserStatus(UserStatusEnum.DISABLED);
 
         return null;
+    }
+
+    public UserResponseDto findById(Long userId) {
+        User findUser = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        return new UserResponseDto(findUser);
+    }
+
+    public UserResponseDto updateUser(Long userId, UserRequestDto requestDto) {
+        User findUser = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        if (requestDto.getPassword() != null) {
+            // 로그인한 유저의 비밀번호와 dto의 비밀번호가 일치하지 않을 때
+
+            // 현재 비밀번호와 변경하려는 비밀번호와 똑같을 때
+        }
+
+        findUser.update(requestDto);
+
+        User savedUser = userRepository.save(findUser);
+        return new UserResponseDto(savedUser);
     }
 }

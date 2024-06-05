@@ -1,7 +1,7 @@
 package com.sparta.wildcard_newsfeed.domain.user.entity;
 
 import com.sparta.wildcard_newsfeed.domain.common.TimeStampEntity;
-import com.sparta.wildcard_newsfeed.domain.user.dto.UserSignupRequestDto;
+import com.sparta.wildcard_newsfeed.domain.user.dto.UserRequestDto;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -51,5 +51,12 @@ public class User extends TimeStampEntity {
     public void setUserStatus(UserStatusEnum userStatus){
         this.userStatus = userStatus;
         this.authUserAt = LocalDateTime.now();
+    }
+
+    public void update(UserRequestDto requestDto) {
+        this.password = requestDto.getPassword() != null ? requestDto.getPassword() : this.password;
+        this.name = requestDto.getName() != null ? requestDto.getName() : this.name;
+        this.email = requestDto.getEmail() != null ? requestDto.getEmail() : this.email;
+        this.introduce = requestDto.getIntroduce() != null ? requestDto.getIntroduce() : this.introduce;
     }
 }
