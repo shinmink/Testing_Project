@@ -23,6 +23,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig {
+
     private final JwtUtil jwtUtil;
     private final ObjectMapper objectMapper;
     private final AuthenticationConfiguration authenticationConfiguration;
@@ -44,15 +45,16 @@ public class WebSecurityConfig {
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
-        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(objectMapper, jwtUtil,
-                userRepository);
+        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(
+                objectMapper, jwtUtil, userRepository);
         filter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
         return filter;
     }
 
     @Bean
     public JwtAuthorizationFilter jwtAuthorizationFilter() {
-        return new JwtAuthorizationFilter(jwtUtil, authenticationUserService, objectMapper, userRepository);
+        return new JwtAuthorizationFilter(jwtUtil, authenticationUserService,
+                userRepository);
     }
 
     @Bean
@@ -66,11 +68,11 @@ public class WebSecurityConfig {
         );
 
         http.authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
-                .requestMatchers("/api/v1/user/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/user/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/post/**").permitAll()
                 .anyRequest().authenticated()
         );
-
+        //security filter
         http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 

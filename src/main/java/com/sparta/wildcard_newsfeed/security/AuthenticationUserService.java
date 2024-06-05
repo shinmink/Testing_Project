@@ -20,8 +20,8 @@ public class AuthenticationUserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        User user = userRepository.findByUsercode(username).orElseThrow(() ->
-                new UserNotFoundException("해당 유저를 찾을 수 없습니다."));
+        User user = userRepository.findByUsercode(username)
+                .orElseThrow(UserNotFoundException::new);
 
         return AuthenticationUser.of(user);
     }

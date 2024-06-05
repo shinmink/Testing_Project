@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestControllerAdvice
@@ -25,27 +27,13 @@ public class ExceptionControllerAdvice {
                         .build());
     }
 
-//    @ExceptionHandler(TokenNotFoundException.class)
-//    public ResponseEntity<ErrorResponseDto> tokenNotFoundException(TokenNotFoundException e) {
-//        log.error("Token 예외 발생 {} " ,e);
-//        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-//                .body(ErrorResponseDto.builder()
-//                        .statusCode(HttpStatus.NOT_FOUND.value())
-//                        .message(e.getMessage())
-//                        .build()
-//                );
-//    }
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponseDto> methodArgumentNotValidException(MethodArgumentNotValidException ex) {
+    public ResponseEntity<Map<String, Object>> methodArgumentNotValidException(MethodArgumentNotValidException ex) {
+        Map<String, Object> responseValid = new LinkedHashMap<>();
         List<String> errorMessageList = new ArrayList<>();
+        responseValid.put("statusCode", HttpStatus.BAD_REQUEST.toString());
         ex.getBindingResult().getAllErrors().forEach(v -> errorMessageList.add(v.getDefaultMessage()));
-        log.error(errorMessageList.toString());
-
-        return ResponseEntity.badRequest()
-                .body(ErrorResponseDto.builder()
-                        .statusCode(HttpStatus.BAD_REQUEST.value())
-                        .message(errorMessageList)
-                        .build());
+        responseValid.put("message", errorMessageList);
+        return ResponseEntity.badRequest().body(responseValid);
     }
 }
