@@ -54,7 +54,7 @@ public class User extends TimeStampEntity {
     }
 
     public void update(UserRequestDto requestDto) {
-        this.password = requestDto.getPassword() != null ? requestDto.getPassword() : this.password;
+        this.password = requestDto.getChangePassword() != null ? requestDto.getChangePassword() : this.password;
         this.name = requestDto.getName() != null ? requestDto.getName() : this.name;
         this.email = requestDto.getEmail() != null ? requestDto.getEmail() : this.email;
         this.introduce = requestDto.getIntroduce() != null ? requestDto.getIntroduce() : this.introduce;
