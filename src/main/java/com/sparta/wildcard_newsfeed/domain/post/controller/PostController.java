@@ -67,12 +67,11 @@ public class PostController {
     @DeleteMapping("/{postId}")
     public ResponseEntity<CommonResponseDto<PostResponseDto>> deletePost(
             @Valid @PathVariable Long postId, HttpServletRequest request) {
-        PostResponseDto postResponseDto = postService.deletePost(postId, request);
+        postService.deletePost(postId, request);
         return ResponseEntity.ok()
                 .body(CommonResponseDto.<PostResponseDto>builder()
                         .statusCode(HttpStatus.OK.value())
                         .message("게시물 삭제 성공")
-                        .data(postResponseDto)
                         .build());
     }
 

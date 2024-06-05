@@ -1,5 +1,6 @@
 package com.sparta.wildcard_newsfeed.domain.post.entity;
 
+import com.sparta.wildcard_newsfeed.domain.common.TimeStampEntity;
 import com.sparta.wildcard_newsfeed.domain.post.dto.PostRequestDto;
 import com.sparta.wildcard_newsfeed.domain.user.entity.User;
 import jakarta.persistence.*;
@@ -12,7 +13,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
-public class Post extends Timestamped {
+public class Post extends TimeStampEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

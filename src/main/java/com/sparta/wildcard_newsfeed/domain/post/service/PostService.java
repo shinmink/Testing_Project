@@ -60,14 +60,13 @@ public class PostService {
     }
 
     @Transactional
-    public PostResponseDto deletePost(Long postId, HttpServletRequest request) {
+    public void deletePost(Long postId, HttpServletRequest request) {
         Post post = findPostById(postId);
         User user = validateTokenAndGetUser(request);
 
         validateUser(post, user.getId());
 
         postRepository.delete(post);
-        return new PostResponseDto(post);
     }
 
     private Post findPostById(long id) {

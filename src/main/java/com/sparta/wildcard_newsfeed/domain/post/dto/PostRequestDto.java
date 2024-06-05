@@ -16,7 +16,6 @@ public class PostRequestDto {
     @NotBlank(message = "내용은 필수 입력 값입니다.")
     private String content;
 
-    //작성자 아이디? 이름?
     @NotBlank(message = "작성자는 필수 입력 값입니다.")
     private String username;
 

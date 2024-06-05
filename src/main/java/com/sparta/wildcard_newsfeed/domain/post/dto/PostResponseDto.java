@@ -10,17 +10,16 @@ public class PostResponseDto {
     private Long id;
     private String title;
     private String content;
-    //작성자 아이디? 이름?
     private String username;
-    private LocalDateTime createAt;
-    private LocalDateTime modifiedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public PostResponseDto(Post post) {
         this.id = post.getId();
         this.title = post.getTitle();
         this.content = post.getContent();
         this.username = post.getUser().getName();
-        this.createAt = post.getCreatedAt();
-        this.modifiedAt = post.getModifiedAt();
+        this.createdAt = post.getCreatedAt();
+        this.updatedAt = post.getUpdatedAt();
     }
 }
