@@ -45,4 +45,9 @@ public class Post extends TimeStampEntity {
     public Long getUserId() {
         return getUser().getId();
     }
+
+    public void update(PostRequestDto postRequestDto) {
+        this.title = postRequestDto.getTitle();
+        this.content = postRequestDto.getContent();
+    }
 }
