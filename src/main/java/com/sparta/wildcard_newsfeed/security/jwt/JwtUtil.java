@@ -43,7 +43,7 @@ public class JwtUtil {
                 .build();
     }
 
-    // 토큰 생성
+    // access Token 생성
     public String createAccessToken(String userCode) {
         Date date = new Date();
 
@@ -58,7 +58,7 @@ public class JwtUtil {
                         .signWith(key, signatureAlgorithm) // 암호화 알고리즘
                         .compact();
     }
-
+    // refresh Token 생성
     public String createRefreshToken(String username) {
         Date date = new Date();
 
@@ -74,7 +74,7 @@ public class JwtUtil {
                         .compact();
     }
 
-    // header 에서 JWT 가져오기
+    // header 에서 access token
     public String getAccessTokenFromHeader(HttpServletRequest request) {
         String bearerToken = request.getHeader(ACCESS_TOKEN_HEADER);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
@@ -83,6 +83,7 @@ public class JwtUtil {
         return null;
     }
 
+    // header 에서 refresh token
     public String getRefreshTokenFromHeader(HttpServletRequest request) {
         String bearerToken = request.getHeader(REFRESH_TOKEN_HEADER);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {

@@ -23,6 +23,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException {
+        log.error("Jwt 인증 도중 예외 발생");
         String exception = (String) request.getAttribute("jwtException");
 
         JwtPropertiesEnum jwtPropertiesValue = JwtPropertiesEnum.fromJwtProperties(exception);

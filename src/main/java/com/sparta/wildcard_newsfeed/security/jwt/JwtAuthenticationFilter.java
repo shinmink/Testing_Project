@@ -2,10 +2,10 @@ package com.sparta.wildcard_newsfeed.security.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.wildcard_newsfeed.domain.common.CommonResponseDto;
-import com.sparta.wildcard_newsfeed.exception.customexception.UserNotFoundException;
 import com.sparta.wildcard_newsfeed.domain.common.error.ErrorResponseDto;
 import com.sparta.wildcard_newsfeed.domain.user.entity.User;
 import com.sparta.wildcard_newsfeed.domain.user.repository.UserRepository;
+import com.sparta.wildcard_newsfeed.exception.customexception.UserNotFoundException;
 import com.sparta.wildcard_newsfeed.security.jwt.dto.AuthRequestDto;
 import com.sparta.wildcard_newsfeed.security.jwt.dto.TokenDto;
 import jakarta.servlet.FilterChain;
@@ -81,10 +81,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .build();
         String body = objectMapper.writeValueAsString(responseDto);
 
-
         response.setStatus(HttpStatus.OK.value());
-        response.setContentType("text/html;charset=UTF-8");
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setContentType("application/json;charset=UTF-8");
         response.addHeader(ACCESS_TOKEN_HEADER, tokenDto.getAccessToken());
         response.addHeader(REFRESH_TOKEN_HEADER, tokenDto.getRefreshToken());
         response.getWriter().write(body);
