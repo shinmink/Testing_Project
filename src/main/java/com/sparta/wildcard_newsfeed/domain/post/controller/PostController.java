@@ -6,6 +6,9 @@ import com.sparta.wildcard_newsfeed.domain.post.dto.PostResponseDto;
 import com.sparta.wildcard_newsfeed.domain.post.service.PostService;
 import com.sparta.wildcard_newsfeed.domain.user.entity.User;
 import com.sparta.wildcard_newsfeed.security.AuthenticationUser;
+
+import jakarta.servlet.http.HttpServletRequest;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +29,8 @@ public class PostController {
 
     // 게시물 등록
     @PostMapping
-    public ResponseEntity<CommonResponseDto<PostResponseDto>> addPost(@Valid @RequestBody PostRequestDto postRequestDto, User user) {
+    public ResponseEntity<CommonResponseDto<PostResponseDto>> addPost(@Valid @RequestBody PostRequestDto postRequestDto,
+                                                                      @AuthenticationPrincipal AuthenticationUser user) {
         PostResponseDto postResponseDto = postService.addPost(postRequestDto, user);
         return ResponseEntity.ok()
                 .body(CommonResponseDto.<PostResponseDto>builder()
