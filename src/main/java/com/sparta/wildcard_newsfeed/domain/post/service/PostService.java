@@ -28,6 +28,7 @@ import java.util.List;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final UserRepository userRepository;
 
     @Transactional
     public PostResponseDto addPost(PostRequestDto postRequestDto, AuthenticationUser user) {
