@@ -6,7 +6,9 @@ import com.sparta.wildcard_newsfeed.domain.post.dto.PostResponseDto;
 import com.sparta.wildcard_newsfeed.domain.post.service.PostService;
 import com.sparta.wildcard_newsfeed.domain.user.entity.User;
 import com.sparta.wildcard_newsfeed.security.AuthenticationUser;
+
 import jakarta.servlet.http.HttpServletRequest;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,12 +54,14 @@ public class PostController {
         return ResponseEntity.ok(post);
     }
 
-
     //게시물 수정
     @PutMapping("/{postId}")
     public ResponseEntity<CommonResponseDto<PostResponseDto>> updatePost(
-            @Valid @RequestBody PostRequestDto postRequestDto, @PathVariable Long postId, HttpServletRequest request) {
-        PostResponseDto postResponseDto = postService.updatePost(postRequestDto, postId, request);
+            @AuthenticationPrincipal AuthenticationUser user,
+            @Valid @RequestBody PostRequestDto postRequestDto,
+            @PathVariable Long postId
+    ) {
+        PostResponseDto postResponseDto = postService.updatePost(postRequestDto, postId, user);
         return ResponseEntity.ok()
                 .body(CommonResponseDto.<PostResponseDto>builder()
                         .statusCode(HttpStatus.OK.value())
@@ -69,13 +73,14 @@ public class PostController {
     //게시물 삭제
     @DeleteMapping("/{postId}")
     public ResponseEntity<CommonResponseDto<PostResponseDto>> deletePost(
-            @Valid @PathVariable Long postId, HttpServletRequest request) {
-        postService.deletePost(postId, request);
+            @AuthenticationPrincipal AuthenticationUser user,
+            @Valid @PathVariable Long postId
+    ) {
+        postService.deletePost(postId, user);
         return ResponseEntity.ok()
                 .body(CommonResponseDto.<PostResponseDto>builder()
                         .statusCode(HttpStatus.OK.value())
                         .message("게시물 삭제 성공")
                         .build());
     }
-
 }

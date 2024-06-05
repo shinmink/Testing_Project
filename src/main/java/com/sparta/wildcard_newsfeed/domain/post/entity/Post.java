@@ -28,13 +28,11 @@ public class Post extends TimeStampEntity {
     @Column(nullable = false)
     private String content;
 
-
     public Post(PostRequestDto postRequestDto, User user) {
         this.user = user;
         this.title = postRequestDto.getTitle();
         this.content = postRequestDto.getContent();
     }
-
 
     public void update(PostRequestDto postRequestDto) {
         this.title = postRequestDto.getTitle();
