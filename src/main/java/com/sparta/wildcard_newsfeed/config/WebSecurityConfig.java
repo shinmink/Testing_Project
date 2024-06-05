@@ -53,7 +53,8 @@ public class WebSecurityConfig {
 
     @Bean
     public JwtAuthorizationFilter jwtAuthorizationFilter() {
-        return new JwtAuthorizationFilter(jwtUtil, authenticationUserService, userRepository);
+        return new JwtAuthorizationFilter(jwtUtil, authenticationUserService,
+                objectMapper, userRepository);
     }
 
     @Bean
@@ -67,7 +68,7 @@ public class WebSecurityConfig {
         );
 
         http.authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
-                .requestMatchers(HttpMethod.GET,"/api/v1/user/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/user/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/post/**").permitAll()
                 .anyRequest().authenticated()
         );

@@ -46,7 +46,7 @@ public class UserController {
                         .build());
     }
 
-    @GetMapping("{userId}")
+    @GetMapping("/{userId}")
     public ResponseEntity<CommonResponseDto<UserResponseDto>> getUser(@PathVariable Long userId) {
         UserResponseDto userResponseDto = userService.findById(userId);
 
@@ -58,7 +58,7 @@ public class UserController {
                         .build());
     }
 
-    @PutMapping("{userId}")
+    @PutMapping("/{userId}")
     public ResponseEntity<CommonResponseDto<UserResponseDto>> updateUser(
             @AuthenticationPrincipal AuthenticationUser loginUser,
             @PathVariable Long userId,

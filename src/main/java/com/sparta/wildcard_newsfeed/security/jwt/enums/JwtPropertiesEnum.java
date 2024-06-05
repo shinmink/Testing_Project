@@ -15,7 +15,7 @@ public enum JwtPropertiesEnum {
     private final String errorMessage;
 
     public static JwtPropertiesEnum fromJwtProperties(String fileExtension) {
-        JwtPropertiesEnum jwtPropertiesEnum = JWT_CLAIMS_IS_EMPTY; //Default message
+        JwtPropertiesEnum jwtPropertiesEnum = INVALID_TOKEN; //Default message
         for (JwtPropertiesEnum value : values()) {
             if (value.getErrorMessage().equalsIgnoreCase(fileExtension)) {
                 jwtPropertiesEnum = value;

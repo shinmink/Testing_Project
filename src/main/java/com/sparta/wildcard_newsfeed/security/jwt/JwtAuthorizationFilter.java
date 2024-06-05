@@ -1,8 +1,10 @@
 package com.sparta.wildcard_newsfeed.security.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.wildcard_newsfeed.domain.common.error.ErrorResponseDto;
+import com.sparta.wildcard_newsfeed.domain.user.entity.User;
 import com.sparta.wildcard_newsfeed.domain.user.repository.UserRepository;
+import com.sparta.wildcard_newsfeed.exception.customexception.TokenNotFoundException;
+import com.sparta.wildcard_newsfeed.exception.customexception.UserNotFoundException;
 import com.sparta.wildcard_newsfeed.security.AuthenticationUserService;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -18,6 +20,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -31,7 +34,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private final UserRepository userRepository;
 
     public JwtAuthorizationFilter(JwtUtil jwtUtil, AuthenticationUserService authenticationUserService,
-                                  ObjectMapper objectMapper, UserRepository userRepository) {
+                                  ObjectMapper objectMapper,
+                                  UserRepository userRepository) {
         this.jwtUtil = jwtUtil;
         this.authenticationUserService = authenticationUserService;
         this.objectMapper = objectMapper;
@@ -42,37 +46,41 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain) throws ServletException, IOException {
 
         String accessTokenValue = jwtUtil.getAccessTokenFromHeader(req);
-        // TODO
-        if (StringUtils.hasText(accessTokenValue) && !jwtUtil.validateToken(accessTokenValue)) {
-            log.info("Access Token 검증");
-            if (!jwtUtil.validateToken(accessTokenValue)) {
-                log.error("Access Token이 만료되었습니다.");
 
-                unsuccessAccessToken(res);
+        log.info("access token 검증");
+        if (StringUtils.hasText(accessTokenValue) && jwtUtil.validateToken(req, accessTokenValue)) {
+
+            log.info("refresh token 검증");
+
+            String refreshTokenValue = jwtUtil.getRefreshTokenFromHeader(req);
+            if (StringUtils.hasText(refreshTokenValue) && jwtUtil.validateToken(req, refreshTokenValue)) {
+                String usercode = jwtUtil.getUserInfoFromToken(refreshTokenValue).getSubject();
+                User findUser = userRepository.findByUsercode(usercode)
+                        .orElseThrow(UserNotFoundException::new);
+
+                if (isValidateUserAndToken(usercode, findUser, refreshTokenValue)) {
+                    log.info("asdfasfasfasf");
+                    //access token 및 refresh token 검증 완료
+                    log.info("Token 인증 완료");
+                    Claims info = jwtUtil.getUserInfoFromToken(accessTokenValue);
+                    setAuthentication(info.getSubject());
+                }
             } else {
-                //access 유효한 경우
-                Claims info = jwtUtil.getUserInfoFromToken(accessTokenValue);
-                setAuthentication(info.getSubject());
+                log.error("유효하지 않는 Refersh Token");
+                throw new TokenNotFoundException("토큰에 문제가 생김");
             }
+
         }
 
         filterChain.doFilter(req, res);
     }
 
-    private void unsuccessAccessToken(HttpServletResponse res) throws IOException {
-        log.error("해당 Access Token이 만료되었습니다.");
-
-        int httpStatus = HttpStatus.FORBIDDEN.value();
-        ErrorResponseDto errorResponse = ErrorResponseDto.builder()
-                .message("Access Token이 만료된 상태입니다.")
-                .statusCode(httpStatus)
-                .build();
-        String body = objectMapper.writeValueAsString(errorResponse);
-
-        res.setStatus(httpStatus);
-        res.setContentType("text/html;charset=UTF-8");
-        res.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        res.getWriter().write(body);
+    private boolean isValidateUserAndToken(String usercode, User findUser, String refreshTokenValue) {
+        if (usercode.equals(findUser.getUsercode())
+                && refreshTokenValue.equals(findUser.getRefreshToken())) {
+            return true;
+        }
+        return false;
     }
 
 
