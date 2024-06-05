@@ -36,24 +36,48 @@ public class PostService {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
 
+    @Transactional
+    public PostResponseDto addPost(PostRequestDto postRequestDto, User user) {
+        Post post = new Post(postRequestDto, user);
+        postRepository.save(post);
+        return new PostResponseDto(post);
+    }
+
     public PostResponseDto findById(long id) {
         Post post = findPostById(id);
-        return PostResponseDto.toDto(post);
+        return new PostResponseDto(post);
     }
 
     public List<PostResponseDto> findAll() {
         List<Post> postlist = postRepository.findAll();
         return postlist.stream()
                 .sorted(Comparator.comparing(Post::getCreatedAt).reversed())
-                .map(PostResponseDto::toDto)
+                .map(PostResponseDto::new)
                 .toList();
     }
 
+
     @Transactional
-    public PostResponseDto addPost(PostRequestDto postRequestDto, User user) {
-        Post post = new Post(postRequestDto, user);
+    public PostResponseDto updatePost(PostRequestDto postRequestDto, Long postId, HttpServletRequest request) {
+        Post post = findPostById(postId);
+        User user = validateTokenAndGetUser(request);
+
+        validateUser(post, user.getId());
+
+        post.update(postRequestDto);
         postRepository.save(post);
-        return PostResponseDto.toDto(post);
+        return new PostResponseDto(post);
+    }
+
+    @Transactional
+    public PostResponseDto deletePost(Long postId, HttpServletRequest request) {
+        Post post = findPostById(postId);
+        User user = validateTokenAndGetUser(request);
+
+        validateUser(post, user.getId());
+
+        postRepository.delete(post);
+        return null;
     }
 
     private Post findPostById(long id) {
@@ -80,26 +104,4 @@ public class PostService {
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자입니다."));
     }
 
-    @Transactional
-    public PostResponseDto updatePost(PostRequestDto postRequestDto, Long postId, HttpServletRequest request) {
-        Post post = findPostById(postId);
-        User user = validateTokenAndGetUser(request);
-
-        validateUser(post, user.getId());
-
-        post.update(postRequestDto);
-        postRepository.save(post);
-        return PostResponseDto.toDto(post);
-    }
-
-    @Transactional
-    public PostResponseDto deletePost(Long postId, HttpServletRequest request) {
-        Post post = findPostById(postId);
-        User user = validateTokenAndGetUser(request);
-
-        validateUser(post, user.getId());
-
-        postRepository.delete(post);
-        return null;
-    }
 }

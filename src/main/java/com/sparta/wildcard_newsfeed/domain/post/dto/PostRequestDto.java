@@ -17,8 +17,6 @@ public class PostRequestDto {
     @NotBlank(message = "작성자는 필수 입력 값입니다.")
     private String username;
 
-    @NotNull(message = "작성일자는 필수 입력 값입니다.")
-    private String date;
     // 작성일자는 보통 서버에서 자동으로 설정하지만, 필요 시 클라이언트에서 받을 수도.
 
     // 기본 생성자
@@ -26,11 +24,10 @@ public class PostRequestDto {
     }
 
     // 모든 필드를 포함한 생성자
-    public PostRequestDto(String title, String content, String username, String date) {
+    public PostRequestDto(String title, String content, String username) {
         this.title = title;
         this.content = content;
         this.username = username;
-        this.date = date;
     }
 
 }
