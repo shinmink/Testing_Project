@@ -7,6 +7,12 @@ import com.sparta.wildcard_newsfeed.domain.user.dto.UserSignupRequestDto;
 import com.sparta.wildcard_newsfeed.domain.user.dto.UserSignupResponseDto;
 import com.sparta.wildcard_newsfeed.domain.user.service.UserService;
 import com.sparta.wildcard_newsfeed.security.AuthenticationUser;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,10 +25,17 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/user")
+@Tag(name = "User 컨트롤러", description = "user API")
 public class UserController {
     private final UserService userService;
 
     @PostMapping("/signup")
+    @Operation(summary = "회원가입")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "회원가입 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CommonResponseDto.class)))
+    })
     public ResponseEntity<CommonResponseDto<UserSignupResponseDto>> signup(@Valid @RequestBody UserSignupRequestDto requestDto) {
         UserSignupResponseDto responseDto = userService.signup(requestDto);
 
@@ -30,11 +43,16 @@ public class UserController {
                 .body(CommonResponseDto.<UserSignupResponseDto>builder()
                         .statusCode(HttpStatus.OK.value())
                         .message("회원가입 성공")
-                        .data(responseDto)
                         .build());
     }
 
     @PostMapping("/resign")
+    @Operation(summary = "회원탈퇴")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "회원탈퇴 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CommonResponseDto.class)))
+    })
     public ResponseEntity<CommonResponseDto<UserSignupResponseDto>> resign(@Valid @RequestBody UserSignupRequestDto requestDto) {
         UserSignupResponseDto responseDto = userService.resign(requestDto);
 
@@ -42,11 +60,16 @@ public class UserController {
                 .body(CommonResponseDto.<UserSignupResponseDto>builder()
                         .statusCode(HttpStatus.OK.value())
                         .message("회원탈퇴 성공")
-                        .data(responseDto)
                         .build());
     }
 
     @GetMapping("/{userId}")
+    @Operation(summary = "프로필 조회")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "프로필 조회 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CommonResponseDto.class)))
+    })
     public ResponseEntity<CommonResponseDto<UserResponseDto>> getUser(@PathVariable Long userId) {
         UserResponseDto userResponseDto = userService.findById(userId);
 
@@ -59,6 +82,12 @@ public class UserController {
     }
 
     @PutMapping("/{userId}")
+    @Operation(summary = "프로필 수정")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "프로필 수정 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CommonResponseDto.class)))
+    })
     public ResponseEntity<CommonResponseDto<UserResponseDto>> updateUser(
             @AuthenticationPrincipal AuthenticationUser loginUser,
             @PathVariable Long userId,
