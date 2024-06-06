@@ -14,23 +14,15 @@ public class CommentResponseDto {
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private Long postId;
 
-    public CommentResponseDto(Long id, String comment, String username, Long postId, LocalDateTime createdAt) {
-        this.id = id;
-        this.comment = comment;
-        this.username = username;
-        this.postId = postId;
-        this.createdAt = createdAt;
-    }
-
-    public static CommentResponseDto toDto(Comment comment) {
-        return new CommentResponseDto(
-                comment.getId(),
-                comment.getContent(),
-                comment.getUser().getName(),
-                comment.getPost().getId(),
-                comment.getCreatedAt()
-        );
+    public CommentResponseDto(Comment comment) {
+        this.id = comment.getId();
+        this.comment = comment.getContent();
+        this.username = comment.getUser().getName();
+        this.postId = comment.getPost().getId();
+        this.createdAt = comment.getCreatedAt();
+        this.updatedAt = comment.getUpdatedAt();
     }
 }

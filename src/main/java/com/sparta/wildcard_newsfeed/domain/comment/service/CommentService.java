@@ -4,14 +4,22 @@ import com.sparta.wildcard_newsfeed.domain.comment.dto.CommentRequestDto;
 import com.sparta.wildcard_newsfeed.domain.comment.dto.CommentResponseDto;
 import com.sparta.wildcard_newsfeed.domain.comment.entity.Comment;
 import com.sparta.wildcard_newsfeed.domain.comment.repository.CommentRepository;
+import com.sparta.wildcard_newsfeed.domain.post.dto.PostResponseDto;
 import com.sparta.wildcard_newsfeed.domain.post.entity.Post;
 import com.sparta.wildcard_newsfeed.domain.post.repository.PostRepository;
+import com.sparta.wildcard_newsfeed.domain.user.entity.User;
+import com.sparta.wildcard_newsfeed.domain.user.repository.UserRepository;
+import com.sparta.wildcard_newsfeed.security.AuthenticationUser;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -20,37 +28,39 @@ public class CommentService {
 
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
+    private final UserRepository userRepository;
 
     @Transactional
-    public CommentResponseDto save(long postId, CommentRequestDto request) {
-        // DB에 일정이 존재하지 않는 경우
+    public CommentResponseDto addComment(long postId, CommentRequestDto request, AuthenticationUser user) {
+        User byUsercode = userRepository.findByUsercode(user.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        // DB에 게시물이 존재하지 않는 경우
         Post post = findPostById(postId);
-        Comment comment = commentRepository.save(new Comment(request.getComment(), request.getUser(), post));
-        return CommentResponseDto.toDto(commentRepository.save(comment));
+        Comment comment = commentRepository.save(new Comment(request.getComment(), byUsercode, post));
+        return new CommentResponseDto(comment);
     }
 
 
-    public CommentResponseDto update(long postId, long commentId, CommentRequestDto request) {
-        // DB에 일정이 존재하지 않는 경우
+    public CommentResponseDto updateComment(long postId, long commentId, CommentRequestDto request) {
+        // DB에 게시물이 존재하지 않는 경우
         findPostById(postId);
         // 해당 댓글이 DB에 존재하지 않는 경우
         Comment comment = findCommentById(commentId);
-
-        // 사용자가 일치하지 않는 경우
-        if (!Objects.equals(comment.getUser().getName(), request.getUser().getName())) {
-            throw new IllegalArgumentException("작성자만 수정할 수 있습니다.");
-        }
 
         comment.update(request.getComment());
-        return CommentResponseDto.toDto(comment);
+        commentRepository.save(comment);
+        return new CommentResponseDto(comment);
     }
 
-    public void delete(long postId, long commentId, String username) {
+    public void deleteComment(long postId, long commentId, String username) {
 
-        // DB에 일정이 존재하지 않는 경우
+        // DB에 게시물이 존재하지 않는 경우
         findPostById(postId);
+
         // 해당 댓글이 DB에 존재하지 않는 경우
         Comment comment = findCommentById(commentId);
+
         // 작성자가 동일하지 않는 경우
         if (!Objects.equals(comment.getUser().getName(), username)) {
             throw new IllegalArgumentException("작성자만 삭제할 수 있습니다.");
@@ -58,6 +68,14 @@ public class CommentService {
 
         commentRepository.delete(comment);
 
+    }
+
+    public List<CommentResponseDto> findAllCommentsByPostId(long postId) {
+        // 해당 postId와 연관된 댓글을 조회하는 로직 구현
+        List<Comment> comments = commentRepository.findByPostId(postId);
+        return comments.stream()
+                .map(CommentResponseDto::new)
+                .collect(Collectors.toList());
     }
 
     public Comment findCommentById(Long commentId) {
@@ -68,5 +86,13 @@ public class CommentService {
     private Post findPostById(long id) {
         return postRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시물이 존재하지 않습니다."));
+    }
+
+    public List<CommentResponseDto> findAll() {
+        List<Comment> commentlist = commentRepository.findAll();
+        return commentlist.stream()
+                .sorted(Comparator.comparing(Comment::getCreatedAt).reversed())
+                .map(CommentResponseDto::new)
+                .toList();
     }
 }
