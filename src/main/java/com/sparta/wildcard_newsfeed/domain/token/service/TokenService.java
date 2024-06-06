@@ -1,8 +1,10 @@
 package com.sparta.wildcard_newsfeed.domain.token.service;
 
 import com.sparta.wildcard_newsfeed.domain.token.dto.TokenResponseDto;
+import com.sparta.wildcard_newsfeed.domain.user.dto.UserResponseFromTokenDto;
 import com.sparta.wildcard_newsfeed.domain.user.entity.User;
 import com.sparta.wildcard_newsfeed.domain.user.repository.UserRepository;
+import com.sparta.wildcard_newsfeed.domain.user.service.UserService;
 import com.sparta.wildcard_newsfeed.exception.customexception.TokenNotFoundException;
 import com.sparta.wildcard_newsfeed.exception.customexception.UserNotFoundException;
 import com.sparta.wildcard_newsfeed.security.jwt.JwtUtil;
@@ -10,13 +12,15 @@ import com.sparta.wildcard_newsfeed.security.jwt.dto.TokenDto;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class TokenService {
 
     private final JwtUtil jwtUtil;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     public String validateTokenExpire(HttpServletRequest request) {
         String accessTokenHeader = jwtUtil.getAccessTokenFromHeader(request);
@@ -33,18 +37,16 @@ public class TokenService {
         return refreshTokenHeader;
     }
 
-
+    @Transactional
     public TokenResponseDto getFindUser(String refreshTokenHeader) {
         String usercode = jwtUtil.getUserInfoFromToken(refreshTokenHeader).getSubject();
-        User findUser = userRepository.findByUsercode(usercode).orElseThrow(UserNotFoundException::new);
+        UserResponseFromTokenDto findUserDto = userService.findByUsercode(usercode);
 
-        TokenDto tokenDto = jwtUtil.generateAccessTokenAndRefreshToken(findUser.getUsercode());
+        TokenDto tokenDto = jwtUtil.generateAccessTokenAndRefreshToken(findUserDto.getUsercode());
         String refreshTokenValue = tokenDto.getRefreshToken().substring(7);
-        findUser.setRefreshToken(refreshTokenValue);
+        userService.updateRefreshToken(findUserDto.getUsercode(), refreshTokenValue);
 
-        userRepository.save(findUser);
-
-        return TokenResponseDto.of(findUser,tokenDto);
+        return TokenResponseDto.of(findUserDto, tokenDto);
 
     }
 }

@@ -1,12 +1,10 @@
 package com.sparta.wildcard_newsfeed.domain.user.service;
 
-import com.sparta.wildcard_newsfeed.domain.user.dto.UserRequestDto;
-import com.sparta.wildcard_newsfeed.domain.user.dto.UserResponseDto;
-import com.sparta.wildcard_newsfeed.domain.user.dto.UserSignupRequestDto;
-import com.sparta.wildcard_newsfeed.domain.user.dto.UserSignupResponseDto;
+import com.sparta.wildcard_newsfeed.domain.user.dto.*;
 import com.sparta.wildcard_newsfeed.domain.user.entity.User;
 import com.sparta.wildcard_newsfeed.domain.user.entity.UserStatusEnum;
 import com.sparta.wildcard_newsfeed.domain.user.repository.UserRepository;
+import com.sparta.wildcard_newsfeed.exception.customexception.UserNotFoundException;
 import com.sparta.wildcard_newsfeed.security.AuthenticationUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -98,5 +96,15 @@ public class UserService {
 
         User savedUser = userRepository.save(findUser);
         return new UserResponseDto(savedUser);
+    }
+
+    public UserResponseFromTokenDto findByUsercode(String usercode) {
+        User user = userRepository.findByUsercode(usercode).orElseThrow(UserNotFoundException::new);
+        return UserResponseFromTokenDto.of(user);
+    }
+
+    public void updateRefreshToken(String usercode, String refreshToken) {
+        User user = userRepository.findByUsercode(usercode).orElseThrow(UserNotFoundException::new);
+        user.setRefreshToken(refreshToken);
     }
 }
