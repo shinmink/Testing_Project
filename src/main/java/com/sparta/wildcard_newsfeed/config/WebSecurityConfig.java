@@ -69,7 +69,7 @@ public class WebSecurityConfig {
 
         http.authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
                 .requestMatchers(SWAGGER_PATTERNS).permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/v1/users/signup").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/user/signup").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/user/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/post/**").permitAll()
                 .anyRequest().authenticated()

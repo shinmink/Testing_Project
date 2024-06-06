@@ -9,8 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Setter
 @Entity
@@ -30,20 +28,14 @@ public class Post extends TimeStampEntity {
     @Column(nullable = false)
     private String content;
 
-    private LocalDateTime createdAt; //게시물 생성 시간
-    private LocalDateTime updatedAt; //게시물 최근 수정 시간
-
     public Post(PostRequestDto postRequestDto, User user) {
         this.user = user;
         this.title = postRequestDto.getTitle();
         this.content = postRequestDto.getContent();
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
     }
 
     public void update(PostRequestDto postRequestDto) {
         this.title = postRequestDto.getTitle();
         this.content = postRequestDto.getContent();
-        this.updatedAt = LocalDateTime.now();
     }
 }

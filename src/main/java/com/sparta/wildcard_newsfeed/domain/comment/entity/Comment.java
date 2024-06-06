@@ -7,8 +7,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Entity
 @NoArgsConstructor
@@ -29,20 +27,14 @@ public class Comment extends TimeStampEntity {
     private String content;
     private Long likeCount;
 
-    private LocalDateTime createdAt; //댓글 생성 시간
-    private LocalDateTime updatedAt; //댓글 최근 수정 시간
-
     public Comment(String content, User user, Post post) {
         this.content = content;
         this.user = user;
         this.post = post;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
     }
 
 
     public void update(String comment) {
         this.content = comment;
-        this.updatedAt = LocalDateTime.now();
     }
 }

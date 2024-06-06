@@ -4,7 +4,6 @@ import com.sparta.wildcard_newsfeed.domain.comment.dto.CommentRequestDto;
 import com.sparta.wildcard_newsfeed.domain.comment.dto.CommentResponseDto;
 import com.sparta.wildcard_newsfeed.domain.comment.entity.Comment;
 import com.sparta.wildcard_newsfeed.domain.comment.repository.CommentRepository;
-import com.sparta.wildcard_newsfeed.domain.post.dto.PostResponseDto;
 import com.sparta.wildcard_newsfeed.domain.post.entity.Post;
 import com.sparta.wildcard_newsfeed.domain.post.repository.PostRepository;
 import com.sparta.wildcard_newsfeed.domain.user.entity.User;
@@ -13,7 +12,6 @@ import com.sparta.wildcard_newsfeed.security.AuthenticationUser;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -41,7 +39,6 @@ public class CommentService {
         return new CommentResponseDto(comment);
     }
 
-
     public CommentResponseDto updateComment(long postId, long commentId, CommentRequestDto request) {
         // DB에 게시물이 존재하지 않는 경우
         findPostById(postId);
@@ -54,7 +51,6 @@ public class CommentService {
     }
 
     public void deleteComment(long postId, long commentId, String username) {
-
         // DB에 게시물이 존재하지 않는 경우
         findPostById(postId);
 
@@ -67,7 +63,6 @@ public class CommentService {
         }
 
         commentRepository.delete(comment);
-
     }
 
     public List<CommentResponseDto> findAllCommentsByPostId(long postId) {
