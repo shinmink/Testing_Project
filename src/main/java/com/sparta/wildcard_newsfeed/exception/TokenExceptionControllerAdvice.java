@@ -28,5 +28,4 @@ public class TokenExceptionControllerAdvice {
                         .message(e.getMessage())
                         .build());
     }
-
 }

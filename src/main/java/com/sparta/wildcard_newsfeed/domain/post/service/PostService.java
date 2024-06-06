@@ -5,19 +5,12 @@ import com.sparta.wildcard_newsfeed.domain.post.dto.PostResponseDto;
 import com.sparta.wildcard_newsfeed.domain.post.entity.Post;
 import com.sparta.wildcard_newsfeed.domain.post.repository.PostRepository;
 import com.sparta.wildcard_newsfeed.domain.user.entity.User;
-
 import com.sparta.wildcard_newsfeed.domain.user.repository.UserRepository;
 import com.sparta.wildcard_newsfeed.security.AuthenticationUser;
-import com.sparta.wildcard_newsfeed.security.jwt.JwtUtil;
-import io.jsonwebtoken.Claims;
-import jakarta.servlet.http.HttpServletRequest;
-
-import com.sparta.wildcard_newsfeed.security.AuthenticationUser;
-
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;

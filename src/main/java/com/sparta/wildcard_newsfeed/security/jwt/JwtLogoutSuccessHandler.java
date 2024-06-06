@@ -22,8 +22,7 @@ public class JwtLogoutSuccessHandler implements LogoutSuccessHandler {
     private final ObjectMapper objectMapper;
 
     @Override
-    public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response,
-                                Authentication authentication) throws IOException {
+    public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         log.info("로그아웃 성공");
         CommonResponseDto responseDto = CommonResponseDto.builder()
                 .message("로그아웃 성공하였습니다.")
