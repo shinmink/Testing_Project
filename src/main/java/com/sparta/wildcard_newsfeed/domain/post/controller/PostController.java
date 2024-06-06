@@ -1,6 +1,7 @@
 package com.sparta.wildcard_newsfeed.domain.post.controller;
 
 import com.sparta.wildcard_newsfeed.domain.comment.dto.CommentResponseDto;
+import com.sparta.wildcard_newsfeed.domain.comment.dto.PostWithCommentsResponseDto;
 import com.sparta.wildcard_newsfeed.domain.comment.service.CommentService;
 import com.sparta.wildcard_newsfeed.domain.common.CommonResponseDto;
 import com.sparta.wildcard_newsfeed.domain.post.dto.PostRequestDto;
@@ -64,12 +65,18 @@ public class PostController {
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = CommonResponseDto.class)))
     })
-    public ResponseEntity<List<PostResponseDto>> findAll() {
+    public ResponseEntity<CommonResponseDto<Object>> findAll() {
         List<PostResponseDto> posts = postService.findAll();
-        return ResponseEntity.ok(posts);
+
+        return ResponseEntity.ok()
+                .body(CommonResponseDto.builder()
+                .statusCode(HttpStatus.OK.value())
+                        .message("게시물 전체 조회 성공")
+                        .data(posts)
+                        .build());
     }
 
-    // 게시물 단일 조회 + 해당 게시물에 달린 댓글 전체 조회
+//    // 게시물 단일 조회 + 해당 게시물에 달린 댓글 전체 조회
     @GetMapping("/{postId}")
     @Operation(summary = "게시물 단일 조회")
     @ApiResponses({
@@ -77,21 +84,22 @@ public class PostController {
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = CommonResponseDto.class)))
     })
-    public ResponseEntity<PostResponseDto> findById(@PathVariable(name = "postId") long id) {
-    public ResponseEntity<List<Object>> findById(@PathVariable(name = "postId") long id) {
+    public ResponseEntity<CommonResponseDto<PostWithCommentsResponseDto>> findById(@PathVariable(name = "postId") long id) {
         // 게시물 단일 조회
         PostResponseDto post = postService.findById(id);
 
         // 해당 게시물에 달린 댓글 전체 조회
         List<CommentResponseDto> comments = commentService.findAllCommentsByPostId(id);
 
-        // Post와 Comments를 하나의 리스트로 병합
-        List<Object> response = new ArrayList<>();
-        response.add(post);
-        response.addAll(comments);
+        // Post와 Comments를 하나의 객체로 병합
+        PostWithCommentsResponseDto postWithCommentsResponse = new PostWithCommentsResponseDto(post, comments);
 
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok()
+                .body(CommonResponseDto.<PostWithCommentsResponseDto>builder()
+                        .statusCode(HttpStatus.OK.value())
+                        .message("게시물 단일 조회, 댓글 조회 성공")
+                        .data(postWithCommentsResponse)
+                        .build());
     }
 
     //게시물 수정
