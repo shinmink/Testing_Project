@@ -65,7 +65,7 @@ public class CommentController {
         return ResponseEntity.ok()
                 .body(CommonResponseDto.<CommentResponseDto>builder()
                         .statusCode(HttpStatus.OK.value())
-                        .message("게시물 삭제 성공")
+                        .message("댓글 삭제 성공")
                         .build());
     }
 }
