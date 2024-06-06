@@ -5,6 +5,12 @@ import com.sparta.wildcard_newsfeed.domain.post.dto.PostRequestDto;
 import com.sparta.wildcard_newsfeed.domain.post.dto.PostResponseDto;
 import com.sparta.wildcard_newsfeed.domain.post.service.PostService;
 import com.sparta.wildcard_newsfeed.security.AuthenticationUser;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,12 +25,19 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/post")
+@Tag(name = "Post 컨트롤러", description = "Post API")
 public class PostController {
 
     private final PostService postService;
 
     // 게시물 등록
     @PostMapping
+    @Operation(summary = "게시물 등록")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "게시물 등록 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CommonResponseDto.class)))
+    })
     public ResponseEntity<CommonResponseDto<PostResponseDto>> addPost(
             @AuthenticationPrincipal AuthenticationUser user,
             @Valid @RequestBody PostRequestDto postRequestDto
@@ -40,6 +53,12 @@ public class PostController {
 
     // 게시물 전체 조회
     @GetMapping
+    @Operation(summary = "게시물 전체 조회")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "게시물 전체 조회 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CommonResponseDto.class)))
+    })
     public ResponseEntity<List<PostResponseDto>> findAll() {
         List<PostResponseDto> posts = postService.findAll();
         return ResponseEntity.ok(posts);
@@ -47,6 +66,12 @@ public class PostController {
 
     // 게시물 단일 조회
     @GetMapping("/{postId}")
+    @Operation(summary = "게시물 단일 조회")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "게시물 단일 조회 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CommonResponseDto.class)))
+    })
     public ResponseEntity<PostResponseDto> findById(@PathVariable(name = "postId") long id) {
         PostResponseDto post = postService.findById(id);
         return ResponseEntity.ok(post);
@@ -54,6 +79,12 @@ public class PostController {
 
     //게시물 수정
     @PutMapping("/{postId}")
+    @Operation(summary = "게시물 수정")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "게시물 수정 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CommonResponseDto.class)))
+    })
     public ResponseEntity<CommonResponseDto<PostResponseDto>> updatePost(
             @AuthenticationPrincipal AuthenticationUser user,
             @Valid @RequestBody PostRequestDto postRequestDto,
@@ -70,6 +101,12 @@ public class PostController {
 
     //게시물 삭제
     @DeleteMapping("/{postId}")
+    @Operation(summary = "게시물 삭제")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "게시물 삭제 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CommonResponseDto.class)))
+    })
     public ResponseEntity<CommonResponseDto<PostResponseDto>> deletePost(
             @AuthenticationPrincipal AuthenticationUser user,
             @Valid @PathVariable Long postId
