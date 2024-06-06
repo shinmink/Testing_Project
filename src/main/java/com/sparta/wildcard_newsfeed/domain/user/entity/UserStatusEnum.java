@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum UserStatusEnum {
-    ENABLED("enable"), DISABLED("disable");
+    ENABLED("enable"),
+    DISABLED("disable"),
+    UNAUTHORIZED("unauthorized");
     private final String status;
 }

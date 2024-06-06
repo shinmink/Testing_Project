@@ -2,10 +2,10 @@ package com.sparta.wildcard_newsfeed.security.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.wildcard_newsfeed.domain.common.CommonResponseDto;
-import com.sparta.wildcard_newsfeed.exception.customexception.UserNotFoundException;
 import com.sparta.wildcard_newsfeed.domain.common.error.ErrorResponseDto;
 import com.sparta.wildcard_newsfeed.domain.user.entity.User;
 import com.sparta.wildcard_newsfeed.domain.user.repository.UserRepository;
+import com.sparta.wildcard_newsfeed.exception.customexception.UserNotFoundException;
 import com.sparta.wildcard_newsfeed.security.jwt.dto.AuthRequestDto;
 import com.sparta.wildcard_newsfeed.security.jwt.dto.TokenDto;
 import jakarta.servlet.FilterChain;
@@ -18,11 +18,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 
-import static com.sparta.wildcard_newsfeed.security.jwt.JwtConstants.ACCESS_TOKEN_HEADER;
-import static com.sparta.wildcard_newsfeed.security.jwt.JwtConstants.REFRESH_TOKEN_HEADER;
+import static com.sparta.wildcard_newsfeed.security.jwt.JwtConstants.*;
 
 @Slf4j(topic = "로그인 및 JWT 생성")
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -62,11 +62,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException {
         log.info("로그인 성공 및 JWT 토큰 발행");
-        User user = userRepository.findByUsercode(authResult.getName()).orElseThrow(() ->
-                new UserNotFoundException("해당 유저를 찾을 수 없습니다."));
+        User user = userRepository.findByUsercode(authResult.getName())
+                .orElseThrow(UserNotFoundException::new);
 
         TokenDto tokenDto = jwtUtil.generateAccessTokenAndRefreshToken(user.getUsercode());
-        user.setRefreshToken(tokenDto.getRefreshToken());
+        String refreshTokenValue = tokenDto.getRefreshToken().substring(7);
+        user.setRefreshToken(refreshTokenValue);
         userRepository.save(user);
 
         loginSuccessResponse(response, tokenDto);
@@ -81,10 +82,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .build();
         String body = objectMapper.writeValueAsString(responseDto);
 
-
         response.setStatus(HttpStatus.OK.value());
-        response.setContentType("text/html;charset=UTF-8");
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setContentType("application/json;charset=UTF-8");
         response.addHeader(ACCESS_TOKEN_HEADER, tokenDto.getAccessToken());
         response.addHeader(REFRESH_TOKEN_HEADER, tokenDto.getRefreshToken());
         response.getWriter().write(body);

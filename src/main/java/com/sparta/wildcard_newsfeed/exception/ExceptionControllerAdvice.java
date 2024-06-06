@@ -25,24 +25,12 @@ public class ExceptionControllerAdvice {
                         .build());
     }
 
-//    @ExceptionHandler(TokenNotFoundException.class)
-//    public ResponseEntity<ErrorResponseDto> tokenNotFoundException(TokenNotFoundException e) {
-//        log.error("Token 예외 발생 {} " ,e);
-//        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-//                .body(ErrorResponseDto.builder()
-//                        .statusCode(HttpStatus.NOT_FOUND.value())
-//                        .message(e.getMessage())
-//                        .build()
-//                );
-//    }
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponseDto> methodArgumentNotValidException(MethodArgumentNotValidException ex) {
         List<String> errorMessageList = new ArrayList<>();
         ex.getBindingResult().getAllErrors().forEach(v -> errorMessageList.add(v.getDefaultMessage()));
-        log.error(errorMessageList.toString());
 
-        return ResponseEntity.badRequest()
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ErrorResponseDto.builder()
                         .statusCode(HttpStatus.BAD_REQUEST.value())
                         .message(errorMessageList)
