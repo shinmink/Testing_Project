@@ -23,5 +23,5 @@ public class Liked extends TimeStampEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ContentsTypeEnum contentsType;
+    private ContentsType contentsType;
 }

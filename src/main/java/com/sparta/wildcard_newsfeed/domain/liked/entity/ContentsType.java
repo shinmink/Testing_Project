@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum ContentsTypeEnum {
+public enum ContentsType {
     COMMENT("comment"),
     POST("post");
     private final String contentsType;
