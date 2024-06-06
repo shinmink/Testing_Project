@@ -4,11 +4,7 @@ import com.sparta.wildcard_newsfeed.domain.common.CommonResponseDto;
 import com.sparta.wildcard_newsfeed.domain.post.dto.PostRequestDto;
 import com.sparta.wildcard_newsfeed.domain.post.dto.PostResponseDto;
 import com.sparta.wildcard_newsfeed.domain.post.service.PostService;
-import com.sparta.wildcard_newsfeed.domain.user.entity.User;
 import com.sparta.wildcard_newsfeed.security.AuthenticationUser;
-
-import jakarta.servlet.http.HttpServletRequest;
-
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,8 +25,10 @@ public class PostController {
 
     // 게시물 등록
     @PostMapping
-    public ResponseEntity<CommonResponseDto<PostResponseDto>> addPost(@Valid @RequestBody PostRequestDto postRequestDto,
-                                                                      @AuthenticationPrincipal AuthenticationUser user) {
+    public ResponseEntity<CommonResponseDto<PostResponseDto>> addPost(
+            @AuthenticationPrincipal AuthenticationUser user,
+            @Valid @RequestBody PostRequestDto postRequestDto
+    ) {
         PostResponseDto postResponseDto = postService.addPost(postRequestDto, user);
         return ResponseEntity.ok()
                 .body(CommonResponseDto.<PostResponseDto>builder()
@@ -48,8 +46,8 @@ public class PostController {
     }
 
     // 게시물 단일 조회
-    @GetMapping("/{postid}")
-    public ResponseEntity<PostResponseDto> findById(@PathVariable(name = "postid") long id) {
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostResponseDto> findById(@PathVariable(name = "postId") long id) {
         PostResponseDto post = postService.findById(id);
         return ResponseEntity.ok(post);
     }

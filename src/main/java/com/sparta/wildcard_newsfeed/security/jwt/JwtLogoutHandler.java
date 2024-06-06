@@ -4,7 +4,6 @@ import com.sparta.wildcard_newsfeed.domain.user.entity.User;
 import com.sparta.wildcard_newsfeed.domain.user.repository.UserRepository;
 import com.sparta.wildcard_newsfeed.exception.customexception.TokenNotFoundException;
 import com.sparta.wildcard_newsfeed.exception.customexception.UserNotFoundException;
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +22,7 @@ public class JwtLogoutHandler implements LogoutHandler {
     private final UserRepository userRepository;
 
     @Override
-    public void logout(HttpServletRequest request, HttpServletResponse response,
-                       Authentication authentication) {
+    public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         log.info("로그아웃 시도");
 
         String accessTokenValue = jwtUtil.getAccessTokenFromHeader(request);

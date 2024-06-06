@@ -45,16 +45,14 @@ public class WebSecurityConfig {
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
-        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(
-                objectMapper, jwtUtil, userRepository);
+        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(objectMapper, jwtUtil, userRepository);
         filter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
         return filter;
     }
 
     @Bean
     public JwtAuthorizationFilter jwtAuthorizationFilter() {
-        return new JwtAuthorizationFilter(jwtUtil, authenticationUserService,
-                userRepository);
+        return new JwtAuthorizationFilter(jwtUtil, authenticationUserService, userRepository);
     }
 
     @Bean
@@ -72,6 +70,7 @@ public class WebSecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/v1/post/**").permitAll()
                 .anyRequest().authenticated()
         );
+
         //security filter
         http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
@@ -87,6 +86,7 @@ public class WebSecurityConfig {
         http.exceptionHandling(exceptionHandling ->
                 exceptionHandling.authenticationEntryPoint(jwtAuthenticationEntryPoint)
         );
+
         return http.build();
     }
 }

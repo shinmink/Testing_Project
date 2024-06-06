@@ -42,14 +42,12 @@ public class UserService {
     public UserSignupResponseDto resign(UserSignupRequestDto requestDto) {
         String usercode = requestDto.getUsercode();
 
-        Optional<User> userExist = userRepository.findByUsercode(usercode);
-        if(!userExist.isPresent())
-            throw new NullPointerException("해당하는 회원이 없습니다!!");
+        User user = userRepository.findByUsercode(usercode)
+                .orElseThrow(() -> new NullPointerException("해당하는 회원이 없습니다!!"));
 
-        User user = userExist.get();
-
-        if(user.getUserStatus() == UserStatusEnum.DISABLED)
+        if(user.getUserStatus() == UserStatusEnum.DISABLED) {
             throw new IllegalArgumentException("이미 탈퇴한 사용자입니다!!");
+        }
 
         if(!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다!!");
