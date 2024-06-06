@@ -45,10 +45,16 @@ public class PostController {
         return ResponseEntity.ok(posts);
     }
 
-    // 게시물 단일 조회
+    // 게시물 단일 조회 + 해당 게시물에 달린 댓글 전체 조회
     @GetMapping("/{postId}")
     public ResponseEntity<PostResponseDto> findById(@PathVariable(name = "postId") long id) {
+        // 게시물 단일 조회
         PostResponseDto post = postService.findById(id);
+
+
+        // 해당 게시물에 달린 댓글 전체 조회
+
+
         return ResponseEntity.ok(post);
     }
 
