@@ -19,6 +19,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import static com.sparta.wildcard_newsfeed.config.SwaggerConstants.SWAGGER_PATTERNS;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -66,7 +68,8 @@ public class WebSecurityConfig {
         );
 
         http.authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
-                .requestMatchers("/api/v1/user/signup").permitAll()
+                .requestMatchers(SWAGGER_PATTERNS).permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/users/signup").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/user/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/post/**").permitAll()
                 .anyRequest().authenticated()
