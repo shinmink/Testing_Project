@@ -1,6 +1,7 @@
 package com.sparta.wildcard_newsfeed.domain.post.service;
 
 import com.sparta.wildcard_newsfeed.domain.post.dto.PostPageRequestDto;
+import com.sparta.wildcard_newsfeed.domain.post.dto.PostPageResponseDto;
 import com.sparta.wildcard_newsfeed.domain.post.dto.PostRequestDto;
 import com.sparta.wildcard_newsfeed.domain.post.dto.PostResponseDto;
 import com.sparta.wildcard_newsfeed.domain.post.entity.Post;
@@ -86,7 +87,7 @@ public class PostService {
     }
 
     @Transactional
-    public Page<PostResponseDto> getPostPage(PostPageRequestDto requestDto) {
+    public Page<PostPageResponseDto> getPostPage(PostPageRequestDto requestDto) {
         log.info(requestDto.toString());
 
         Sort.Direction direction = Sort.Direction.DESC; //ASC 오름차순 , DESC 내림차순
@@ -94,12 +95,12 @@ public class PostService {
 
         // --- 정렬 방식 ---
         //create  or  liked
-        String sortBy = "createdAt";
+        String sortBy = "created_at";
         if(requestDto.getSortBy().equals("CREATE")){
-            sortBy = "createdAt";
+            sortBy = "created_at";
         }
         else if(requestDto.getSortBy().equals("LIKED")){
-            sortBy = "liked";
+            sortBy = "likecount";
         }
         else
             throw new IllegalArgumentException("정렬은 CREATE 또는 LIKED 만 입력 가능합니다.");
@@ -107,34 +108,24 @@ public class PostService {
         Sort sort = Sort.by(direction, sortBy);
         Pageable pageable = PageRequest.of(requestDto.getPage()-1, requestDto.getSize(), sort);
 
-        Page<Post> postList;
+        Page<PostPageResponseDto> postList = null;
 
         //---날짜 부분 ---
-        LocalDate lastDate;
-        LocalDate firstDate;
+        LocalDate lastDate = LocalDate.now();
+        LocalDate firstDate = LocalDate.parse("2000-01-01");
+        // null 이면 모든 날짜를 조회
 
-        if (requestDto.getLastDate() == null && requestDto.getFirstDate() == null) {
-            // null 이면 모든 날짜를 조회
-            postList = postRepository.findAll(pageable);
-        }
-        else {
+        if (requestDto.getLastDate() != null && requestDto.getFirstDate() != null) {
             // 날짜 정보가 있으면 해당 날짜만 조회
             try {
                 lastDate = LocalDate.parse(requestDto.getLastDate());
                 firstDate = LocalDate.parse(requestDto.getFirstDate());
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 throw new IllegalArgumentException("날짜 포맷이 정상적이지 않습니다.");
             }
-
-            if (firstDate.isAfter(lastDate)) {
-                throw new IllegalArgumentException("시작일이 마지막일 보다 미래에 있습니다.");
-            }
-            postList = postRepository.findAllByCreatedAtBetween(firstDate.atStartOfDay(),lastDate.atTime(LocalTime.MAX), pageable);
-            //LocalDate는 쿼리로 못쓰고 LocalDateTime만 가능한가?
         }
 
-
+        postList = postRepository.findPostPages(firstDate.atStartOfDay().toString(), lastDate.atTime(LocalTime.MAX).toString(), pageable);
 
         log.error("total page : "+postList.getTotalPages());
         if(postList.getTotalElements() <= 0){
@@ -145,9 +136,8 @@ public class PostService {
             throw new IllegalArgumentException("유효한 페이지 번호가 아닙니다.");
         }
 
-
-        Page<PostResponseDto> responseDtoList = postList.map(PostResponseDto::new);
-
-        return responseDtoList;
+        //Page<PostResponseDto> responseDtoList = postList.map(PostResponseDto::new);
+        //return responseDtoList;
+        return postList;
     }
 }

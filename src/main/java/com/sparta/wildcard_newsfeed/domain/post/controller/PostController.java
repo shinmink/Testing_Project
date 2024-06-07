@@ -5,6 +5,7 @@ import com.sparta.wildcard_newsfeed.domain.comment.dto.PostWithCommentsResponseD
 import com.sparta.wildcard_newsfeed.domain.comment.service.CommentService;
 import com.sparta.wildcard_newsfeed.domain.common.CommonResponseDto;
 import com.sparta.wildcard_newsfeed.domain.post.dto.PostPageRequestDto;
+import com.sparta.wildcard_newsfeed.domain.post.dto.PostPageResponseDto;
 import com.sparta.wildcard_newsfeed.domain.post.dto.PostRequestDto;
 import com.sparta.wildcard_newsfeed.domain.post.dto.PostResponseDto;
 import com.sparta.wildcard_newsfeed.domain.post.repository.PostRepository;
@@ -150,11 +151,10 @@ public class PostController {
 
     //페이지네이션
     @PostMapping("/page")
-    public ResponseEntity<CommonResponseDto<Page<PostResponseDto>>> getPostPage(@Valid @RequestBody PostPageRequestDto requestDto) {
-        log.info("여기까진 왔음");
-        Page<PostResponseDto> page = postService.getPostPage(requestDto);
+    public ResponseEntity<CommonResponseDto<Page<PostPageResponseDto>>> getPostPage(@Valid @RequestBody PostPageRequestDto requestDto) {
+        Page<PostPageResponseDto> page = postService.getPostPage(requestDto);
         return ResponseEntity.ok()
-                .body(CommonResponseDto.<Page<PostResponseDto>>builder()
+                .body(CommonResponseDto.<Page<PostPageResponseDto>>builder()
                         .statusCode(HttpStatus.OK.value())
                         .message("게시물 페이지 조회 성공")
                         .data(page)
