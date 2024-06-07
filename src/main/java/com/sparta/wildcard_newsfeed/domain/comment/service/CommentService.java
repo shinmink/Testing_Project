@@ -39,11 +39,16 @@ public class CommentService {
         return new CommentResponseDto(comment);
     }
 
-    public CommentResponseDto updateComment(long postId, long commentId, CommentRequestDto request) {
+    public CommentResponseDto updateComment(long postId, long commentId, CommentRequestDto request, AuthenticationUser user) {
         // DB에 게시물이 존재하지 않는 경우
         findPostById(postId);
         // 해당 댓글이 DB에 존재하지 않는 경우
         Comment comment = findCommentById(commentId);
+
+        // 작성자가 동일하지 않는 경우
+        if (!Objects.equals(comment.getUser().getName(), user.getAuthorities())) {
+            throw new IllegalArgumentException("작성자만 삭제할 수 있습니다.");
+        }
 
         comment.update(request.getComment());
         commentRepository.save(comment);

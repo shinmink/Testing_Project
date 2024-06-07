@@ -44,7 +44,7 @@ public class CommentController {
             @PathVariable(name = "postId") Long postId,
             @PathVariable(name = "commentId") long commentId
     ) {
-        CommentResponseDto commentResponseDto = commentService.updateComment(postId, commentId, commentRequestDto);
+        CommentResponseDto commentResponseDto = commentService.updateComment(postId, commentId, commentRequestDto, user);
         return ResponseEntity.ok()
                 .body(CommonResponseDto.<CommentResponseDto>builder()
                         .statusCode(HttpStatus.OK.value())
