@@ -1,18 +1,29 @@
 package com.sparta.wildcard_newsfeed.domain.user.service;
 
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.sparta.wildcard_newsfeed.config.S3Config;
 import com.sparta.wildcard_newsfeed.domain.user.dto.*;
 import com.sparta.wildcard_newsfeed.domain.user.entity.AuthCodeHistory;
 import com.sparta.wildcard_newsfeed.domain.user.entity.User;
 import com.sparta.wildcard_newsfeed.domain.user.entity.UserStatusEnum;
 import com.sparta.wildcard_newsfeed.domain.user.repository.UserRepository;
+import com.sparta.wildcard_newsfeed.exception.customexception.FileException;
 import com.sparta.wildcard_newsfeed.exception.customexception.UserNotFoundException;
 import com.sparta.wildcard_newsfeed.security.AuthenticationUser;
+import com.sparta.wildcard_newsfeed.util.FileUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Objects;
 
 import static com.sparta.wildcard_newsfeed.domain.user.dto.emailtemplate.EmailTemplate.AUTH_EMAIL;
 
@@ -24,6 +35,10 @@ public class UserService {
     private final AuthCodeService authCodeService;
     private final PasswordEncoder passwordEncoder;
     private final ApplicationEventPublisher eventPublisher;
+    private final S3Config s3Config;
+
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucket;
 
     @Transactional
     public UserSignupResponseDto signup(UserSignupRequestDto requestDto) {
@@ -42,9 +57,7 @@ public class UserService {
         AuthCodeHistory authCodeHistory = authCodeService.addAuthCode(user);
 
         //메일 생성 후 전송
-        eventPublisher.publishEvent(
-                EmailSendEvent.of(AUTH_EMAIL.getSub(), AUTH_EMAIL.formatBody(authCodeHistory.getAutoCode()), user.getEmail())
-        );
+        eventPublisher.publishEvent(EmailSendEvent.of(AUTH_EMAIL.getSub(), AUTH_EMAIL.formatBody(authCodeHistory.getAutoCode()), user.getEmail()));
 
         return new UserSignupResponseDto(user);
     }
@@ -93,7 +106,11 @@ public class UserService {
             }
         }
         if (requestDto.getPassword() != null && requestDto.getChangePassword() != null) {
-            if (!loginUser.getPassword().equals(requestDto.getPassword()) || !findUser.getPassword().equals(requestDto.getPassword())) {
+            if (!passwordEncoder.matches(requestDto.getPassword(), loginUser.getPassword())
+                    || !passwordEncoder.matches(requestDto.getPassword(), findUser.getPassword())) {
+                log.error("로그인 한 유저 비밀번호:{}", loginUser.getPassword());
+                log.error("변경할 비밀번호: {}", findUser.getPassword());
+                log.error("현재 입력한 비밀번호: {}", requestDto.getPassword());
                 throw new IllegalArgumentException("사용자가 일치하지 않습니다.");
             }
             if (requestDto.getPassword().equals(requestDto.getChangePassword())) {
@@ -109,21 +126,59 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserResponseFromTokenDto findByUsercode(String usercode) {
-        User user = userRepository.findByUsercode(usercode).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByUsercode(usercode)
+                .orElseThrow(UserNotFoundException::new);
         return UserResponseFromTokenDto.of(user);
     }
 
     @Transactional
     public void updateRefreshToken(String usercode, String refreshToken) {
-        User user = userRepository.findByUsercode(usercode).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByUsercode(usercode)
+                .orElseThrow(UserNotFoundException::new);
         user.setRefreshToken(refreshToken);
     }
 
     @Transactional
     public void verifyAuthCode(AuthenticationUser loginUser, UserEmailRequestDto requestDto) {
-        User findUser = userRepository.findByUsercode(loginUser.getUsername()).orElseThrow(UserNotFoundException::new);
+        User findUser = userRepository.findByUsercode(loginUser.getUsername())
+                .orElseThrow(UserNotFoundException::new);
 
         authCodeService.findByAutoCode(findUser, requestDto.getAuthCode());
         findUser.updateUserStatus();
+    }
+
+    @Transactional
+    public String uploadProfileImage(AuthenticationUser loginUser, Long userId, MultipartFile multipartFile) {
+        User findUser = userRepository.findByUsercode(loginUser.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        if (!Objects.equals(findUser.getId(), userId)) {
+            throw new IllegalArgumentException("사용자가 일치하지 않습니다.");
+        }
+
+        String localLocation = FileUtils.getAbsoluteUploadFolder();
+        String fileName = FileUtils.createUuidFileName(multipartFile.getOriginalFilename());
+
+        String fullFilePath = localLocation + fileName;
+        File saveFile = new File(fullFilePath);
+        try {
+            multipartFile.transferTo(saveFile);
+            log.info("local에 파일 저장 완료: {}", fullFilePath);
+        } catch (IOException e) {
+            throw new FileException("local에 파일을 저장할 수 없습니다.", e);
+        }
+
+        s3Config.amazonS3Client().putObject(
+                new PutObjectRequest(bucket, fileName, saveFile).withCannedAcl(CannedAccessControlList.PublicRead)
+        );
+        String s3Url = s3Config.amazonS3Client().getUrl(bucket, fileName).toString();
+        log.info("S3에 저장한 파일 주소: {}", s3Url);
+        findUser.setProfileImageUrl(s3Url);
+
+        if (saveFile.delete()) {
+            return s3Url;
+        } else {
+            throw new FileException("S3에 파일 저장 후 local 파일 삭제 실패");
+        }
     }
 }

@@ -1,7 +1,10 @@
 package com.sparta.wildcard_newsfeed.domain.user.controller;
 
 import com.sparta.wildcard_newsfeed.domain.common.CommonResponseDto;
-import com.sparta.wildcard_newsfeed.domain.user.dto.*;
+import com.sparta.wildcard_newsfeed.domain.user.dto.UserRequestDto;
+import com.sparta.wildcard_newsfeed.domain.user.dto.UserResponseDto;
+import com.sparta.wildcard_newsfeed.domain.user.dto.UserSignupRequestDto;
+import com.sparta.wildcard_newsfeed.domain.user.dto.UserSignupResponseDto;
 import com.sparta.wildcard_newsfeed.domain.user.service.UserService;
 import com.sparta.wildcard_newsfeed.security.AuthenticationUser;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @RestController
@@ -98,6 +102,28 @@ public class UserController {
                         .statusCode(HttpStatus.OK.value())
                         .message("프로필 수정 성공")
                         .data(userResponseDto)
+                        .build());
+    }
+
+    @PostMapping("/{userId}/profile-image")
+    @Operation(summary = "프로필 사진 업로드")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "프로필 사진 업로드 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CommonResponseDto.class)))
+    })
+    public ResponseEntity<CommonResponseDto<String>> uploadProfileImage(
+            @AuthenticationPrincipal AuthenticationUser loginUser,
+            @PathVariable Long userId,
+            @RequestParam MultipartFile multipartFile
+    ) {
+        String savedS3Url = userService.uploadProfileImage(loginUser, userId, multipartFile);
+
+        return ResponseEntity.ok()
+                .body(CommonResponseDto.<String>builder()
+                        .statusCode(HttpStatus.OK.value())
+                        .message("프로필 사진 업로드 성공")
+                        .data(savedS3Url)
                         .build());
     }
 }
