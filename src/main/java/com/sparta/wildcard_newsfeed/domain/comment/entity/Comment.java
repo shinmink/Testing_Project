@@ -35,6 +35,7 @@ public class Comment extends TimeStampEntity {
         this.content = content;
         this.user = user;
         this.post = post;
+        this.likeCount = 0L;
     }
 
 

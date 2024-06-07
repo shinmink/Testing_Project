@@ -28,6 +28,7 @@ public class Post extends TimeStampEntity {
 
     @Column(nullable = false)
     private String content;
+    private Long likeCount;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
@@ -36,6 +37,7 @@ public class Post extends TimeStampEntity {
         this.user = user;
         this.title = postRequestDto.getTitle();
         this.content = postRequestDto.getContent();
+        this.likeCount = 0L;
     }
 
     public void update(PostRequestDto postRequestDto) {
