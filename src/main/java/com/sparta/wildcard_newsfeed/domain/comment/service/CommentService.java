@@ -46,8 +46,8 @@ public class CommentService {
         Comment comment = findCommentById(commentId);
 
         // 작성자가 동일하지 않는 경우
-        if (!Objects.equals(comment.getUser().getName(), user.getAuthorities())) {
-            throw new IllegalArgumentException("작성자만 삭제할 수 있습니다.");
+        if (!Objects.equals(comment.getUser().getUsercode(), user.getUsername())) {
+            throw new IllegalArgumentException("작성자만 수정할 수 있습니다.");
         }
 
         comment.update(request.getComment());
@@ -63,7 +63,7 @@ public class CommentService {
         Comment comment = findCommentById(commentId);
 
         // 작성자가 동일하지 않는 경우
-        if (!Objects.equals(comment.getUser().getName(), username)) {
+        if (!Objects.equals(comment.getUser().getUsercode(), username)) {
             throw new IllegalArgumentException("작성자만 삭제할 수 있습니다.");
         }
 
