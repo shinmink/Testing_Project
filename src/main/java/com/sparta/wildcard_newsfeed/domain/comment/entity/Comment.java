@@ -4,10 +4,7 @@ import com.sparta.wildcard_newsfeed.domain.common.TimeStampEntity;
 import com.sparta.wildcard_newsfeed.domain.post.entity.Post;
 import com.sparta.wildcard_newsfeed.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Getter
 @Entity
@@ -29,12 +26,15 @@ public class Comment extends TimeStampEntity {
 
     @Column(nullable = false)
     private String content;
+
+    @Setter
     private Long likeCount;
 
     public Comment(String content, User user, Post post) {
         this.content = content;
         this.user = user;
         this.post = post;
+        this.likeCount = 0L;
     }
 
 
