@@ -9,9 +9,7 @@ import lombok.*;
 @Getter
 @Setter
 @Entity
-@NoArgsConstructor(access = AccessLevel.PUBLIC)
-@Builder
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Post extends TimeStampEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
