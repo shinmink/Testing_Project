@@ -43,6 +43,9 @@ public class Comment extends TimeStampEntity {
         this.content = comment;
     }
 
+    public void setLikeCount(Long likeCount) {
+        this.likeCount = likeCount;
+    }
     public void testDataInit() {
         super.setDateTimeInit();
     }

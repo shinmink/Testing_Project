@@ -53,10 +53,12 @@ public class LikedService {
             if (comment.getUser().getId().equals(currentUser.getId())) {
                 throw new IllegalArgumentException("본인이 작성한 댓글에는 좋아요를 남길 수 없습니다.");
             }
+            comment.setLikeCount(comment.getLikeCount() + 1);
         }
 
         Liked liked = new Liked(currentUser, requestDto.getContentsId(), requestDto.getContentsType());
         likedRepository.save(liked);
+
 
         return new LikedResponseDto(liked);
     }
@@ -68,6 +70,12 @@ public class LikedService {
 
         Liked existingLike = likedRepository.findByUserIdAndContentsIdAndContentsType(currentUser.getId(), requestDto.getContentsId(), requestDto.getContentsType())
                 .orElseThrow(() -> new IllegalArgumentException("좋아요가 존재하지 않습니다."));
+
+        if (requestDto.getContentsType() == ContentsTypeEnum.COMMENT) {
+            Comment comment = commentRepository.findById(requestDto.getContentsId())
+                    .orElseThrow(() -> new IllegalArgumentException("댓글을 찾을 수 없습니다."));
+            comment.setLikeCount(comment.getLikeCount() - 1);
+        }
 
         likedRepository.delete(existingLike);
 
