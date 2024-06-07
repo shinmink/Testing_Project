@@ -40,13 +40,16 @@ public class LikedService {
         }
 
         // 본인이 작성한 게시물이나 댓글에 좋아요를 남길 수 없습니다.
+        // POST
         if (requestDto.getContentsType() == ContentsTypeEnum.POST) {
             Post post = postRepository.findById(requestDto.getContentsId())
                     .orElseThrow(() -> new IllegalArgumentException("게시물을 찾을 수 없습니다."));
             if (post.getUser().getId().equals(currentUser.getId())) {
                 throw new IllegalArgumentException("본인이 작성한 게시물에는 좋아요를 남길 수 없습니다.");
             }
-        } else if (requestDto.getContentsType() == ContentsTypeEnum.COMMENT) {
+            post.setLikeCount(post.getLikeCount() + 1); //변경 감지 -> 따로 save 필요없다.
+        } //COMMENT
+        else if (requestDto.getContentsType() == ContentsTypeEnum.COMMENT) {
             Comment comment = commentRepository.findById(requestDto.getContentsId())
                     .orElseThrow(() -> new IllegalArgumentException("댓글을 찾을 수 없습니다."));
             if (comment.getUser().getId().equals(currentUser.getId())) {
@@ -70,13 +73,22 @@ public class LikedService {
         Liked existingLike = likedRepository.findByUserIdAndContentsIdAndContentsType(currentUser.getId(), requestDto.getContentsId(), requestDto.getContentsType())
                 .orElseThrow(() -> new IllegalArgumentException("좋아요가 존재하지 않습니다."));
 
-        if (requestDto.getContentsType() == ContentsTypeEnum.COMMENT) {
+        // 좋아요 수 감소
+        // POST
+        if (requestDto.getContentsType() == ContentsTypeEnum.POST) {
+            Post post = postRepository.findById(requestDto.getContentsId())
+                    .orElseThrow(() -> new IllegalArgumentException("게시물을 찾을 수 없습니다."));
+            post.setLikeCount(post.getLikeCount() - 1);
+        }
+        // COMMENT
+        else if (requestDto.getContentsType() == ContentsTypeEnum.COMMENT) {
             Comment comment = commentRepository.findById(requestDto.getContentsId())
                     .orElseThrow(() -> new IllegalArgumentException("댓글을 찾을 수 없습니다."));
             comment.setLikeCount(comment.getLikeCount() - 1);
         }
 
         likedRepository.delete(existingLike);
+
 
 
     }

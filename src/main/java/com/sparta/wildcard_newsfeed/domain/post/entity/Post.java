@@ -28,6 +28,10 @@ public class Post extends TimeStampEntity {
 
     @Column(nullable = false)
     private String content;
+
+    @Setter
+    //위에 @Setter 있긴 한데 더미 만들려고 달아두신 것 같아서
+    //그냥 여기에도 @Setter 달아두었습니다. 지우셔도 됩니다!
     private Long likeCount;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
