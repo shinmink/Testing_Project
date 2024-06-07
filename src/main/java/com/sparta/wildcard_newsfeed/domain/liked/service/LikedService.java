@@ -15,6 +15,7 @@ import com.sparta.wildcard_newsfeed.security.AuthenticationUser;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.relational.core.sql.Like;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -65,7 +66,11 @@ public class LikedService {
         User currentUser = userRepository.findByUsercode(user.getUsername())
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        likedRepository.deleteByUserIdAndContentsIdAndContentsType(currentUser.getId(), requestDto.getContentsId(), requestDto.getContentsType());
+        Liked existingLike = likedRepository.findByUserIdAndContentsIdAndContentsType(currentUser.getId(), requestDto.getContentsId(), requestDto.getContentsType())
+                .orElseThrow(() -> new IllegalArgumentException("좋아요가 존재하지 않습니다."));
+
+        likedRepository.delete(existingLike);
+
 
     }
 }
