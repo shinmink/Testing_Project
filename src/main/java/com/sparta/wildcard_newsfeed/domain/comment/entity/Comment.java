@@ -26,4 +26,15 @@ public class Comment extends TimeStampEntity {
     @Column(nullable = false)
     private String content;
     private Long likeCount;
+
+    public Comment(String content, User user, Post post) {
+        this.content = content;
+        this.user = user;
+        this.post = post;
+    }
+
+
+    public void update(String comment) {
+        this.content = comment;
+    }
 }

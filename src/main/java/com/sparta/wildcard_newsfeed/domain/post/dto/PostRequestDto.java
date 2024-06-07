@@ -18,7 +18,4 @@ public class PostRequestDto {
     @Schema(description = "게시물 내용", example = "내용")
     @NotBlank(message = "내용은 필수 입력 값입니다.")
     private String content;
-
-    @NotBlank(message = "작성자는 필수 입력 값입니다.")
-    private String username;
 }
