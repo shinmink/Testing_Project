@@ -13,9 +13,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@NoArgsConstructor(access = AccessLevel.PUBLIC)
-@Builder
-@AllArgsConstructor
+@NoArgsConstructor
 public class Post extends TimeStampEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
