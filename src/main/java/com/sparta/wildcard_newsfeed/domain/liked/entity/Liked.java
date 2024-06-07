@@ -14,14 +14,20 @@ public class Liked extends TimeStampEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(nullable = false)
+    @Column(name = "contents_id", nullable = false)
     private Long contentsId;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "content_type", nullable = false)
     private ContentsTypeEnum contentsType;
+
+    public Liked(User user, Long contentsId, ContentsTypeEnum contentsType) {
+        this.user = user;
+        this.contentsId = contentsId;
+        this.contentsType = contentsType;
+    }
 }
