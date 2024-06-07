@@ -1,6 +1,7 @@
 package com.sparta.wildcard_newsfeed.domain.user.service;
 
 import com.sparta.wildcard_newsfeed.domain.user.dto.*;
+import com.sparta.wildcard_newsfeed.domain.user.entity.AuthCodeHistory;
 import com.sparta.wildcard_newsfeed.domain.user.entity.User;
 import com.sparta.wildcard_newsfeed.domain.user.entity.UserStatusEnum;
 import com.sparta.wildcard_newsfeed.domain.user.repository.UserRepository;
@@ -8,32 +9,42 @@ import com.sparta.wildcard_newsfeed.exception.customexception.UserNotFoundExcept
 import com.sparta.wildcard_newsfeed.security.AuthenticationUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import static com.sparta.wildcard_newsfeed.domain.user.dto.emailtemplate.EmailTemplate.AUTH_EMAIL;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final AuthCodeService authCodeService;
     private final PasswordEncoder passwordEncoder;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public UserSignupResponseDto signup(UserSignupRequestDto requestDto) {
         String usercode = requestDto.getUsercode();
+        String email = requestDto.getEmail();
 
-        Optional<User> userExist = userRepository.findByUsercode(usercode);
-        if(userExist.isPresent()) {
-            throw new IllegalArgumentException("중복된 ID로는 회원가입 할 수 없습니다.");
-        }
+        userRepository.findByUsercodeOrEmail(usercode, email).ifPresent(u -> {
+            throw new IllegalArgumentException("이미 가입한 아이디 또는 이메일이 있습니다.");
+        });
 
-        String pwd = passwordEncoder.encode(requestDto.getPassword());
         //Bcrypt 암호화
+        String pwd = passwordEncoder.encode(requestDto.getPassword());
+        User user = userRepository.save(new User(usercode, pwd, email));
 
-        User user = userRepository.save(new User(usercode, pwd));
+        //autocode 생성 및 등록
+        AuthCodeHistory authCodeHistory = authCodeService.addAuthCode(user);
+
+        //메일 생성 후 전송
+        eventPublisher.publishEvent(
+                EmailSendEvent.of(AUTH_EMAIL.getSub(), AUTH_EMAIL.formatBody(authCodeHistory.getAutoCode()), user.getEmail())
+        );
 
         return new UserSignupResponseDto(user);
     }
@@ -45,11 +56,11 @@ public class UserService {
         User user = userRepository.findByUsercode(usercode)
                 .orElseThrow(() -> new NullPointerException("해당하는 회원이 없습니다!!"));
 
-        if(user.getUserStatus() == UserStatusEnum.DISABLED) {
+        if (user.getUserStatus() == UserStatusEnum.DISABLED) {
             throw new IllegalArgumentException("이미 탈퇴한 사용자입니다!!");
         }
 
-        if(!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다!!");
         }
 
@@ -96,13 +107,23 @@ public class UserService {
         return new UserResponseDto(savedUser);
     }
 
+    @Transactional(readOnly = true)
     public UserResponseFromTokenDto findByUsercode(String usercode) {
         User user = userRepository.findByUsercode(usercode).orElseThrow(UserNotFoundException::new);
         return UserResponseFromTokenDto.of(user);
     }
 
+    @Transactional
     public void updateRefreshToken(String usercode, String refreshToken) {
         User user = userRepository.findByUsercode(usercode).orElseThrow(UserNotFoundException::new);
         user.setRefreshToken(refreshToken);
+    }
+
+    @Transactional
+    public void verifyAuthCode(AuthenticationUser loginUser, UserEmailRequestDto requestDto) {
+        User findUser = userRepository.findByUsercode(loginUser.getUsername()).orElseThrow(UserNotFoundException::new);
+
+        authCodeService.findByAutoCode(findUser, requestDto.getAuthCode());
+        findUser.updateUserStatus();
     }
 }

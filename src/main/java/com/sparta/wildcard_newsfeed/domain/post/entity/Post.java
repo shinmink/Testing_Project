@@ -4,10 +4,7 @@ import com.sparta.wildcard_newsfeed.domain.common.TimeStampEntity;
 import com.sparta.wildcard_newsfeed.domain.post.dto.PostRequestDto;
 import com.sparta.wildcard_newsfeed.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
@@ -37,5 +34,9 @@ public class Post extends TimeStampEntity {
     public void update(PostRequestDto postRequestDto) {
         this.title = postRequestDto.getTitle();
         this.content = postRequestDto.getContent();
+    }
+
+    public void setTestDateTime() {
+        super.setDateTimeInit();
     }
 }

@@ -2,6 +2,7 @@ package com.sparta.wildcard_newsfeed.exception;
 
 import com.sparta.wildcard_newsfeed.domain.common.error.ErrorResponseDto;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
+@Order(1)
 @RestControllerAdvice
 public class ExceptionControllerAdvice {
 

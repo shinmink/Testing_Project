@@ -30,26 +30,36 @@ public class User extends TimeStampEntity {
     private UserRoleEnum userRoleEnum;
 
     @Builder
-    public User(String usercode, String password, UserRoleEnum userRoleEnum) {
+    public User(String usercode, String password, String name, String email, String introduce, UserStatusEnum userStatus, LocalDateTime authUserAt, UserRoleEnum userRoleEnum) {
         this.usercode = usercode;
         this.password = password;
+        this.name = name;
+        this.email = email;
+        this.introduce = introduce;
+        this.userStatus = userStatus;
+        this.authUserAt = authUserAt;
         this.userRoleEnum = userRoleEnum;
     }
 
-    /** 가입 시 사용 **/
-    public User(String usercode, String password){
+    /**
+     * 가입 시 사용
+     **/
+    public User(String usercode, String password, String email) {
         this.usercode = usercode;
         this.password = password;
         this.name = usercode;
+        this.email = email;
         //유저 이름의 기본 값은 사용자 ID
-        this.userStatus = UserStatusEnum.ENABLED;
+        this.userStatus = UserStatusEnum.UNAUTHORIZED;
         this.authUserAt = LocalDateTime.now();
         this.userRoleEnum = UserRoleEnum.USER;
         //가입 시 회원상태코드는 정상과 상태 변경 시간 적용
     }
 
-    /** 회원 탈퇴 시 사용 **/
-    public void setUserStatus(UserStatusEnum userStatus){
+    /**
+     * 회원 탈퇴 시 사용
+     **/
+    public void setUserStatus(UserStatusEnum userStatus) {
         this.userStatus = userStatus;
         this.authUserAt = LocalDateTime.now();
     }
@@ -59,5 +69,10 @@ public class User extends TimeStampEntity {
         this.name = requestDto.getName() != null ? requestDto.getName() : this.name;
         this.email = requestDto.getEmail() != null ? requestDto.getEmail() : this.email;
         this.introduce = requestDto.getIntroduce() != null ? requestDto.getIntroduce() : this.introduce;
+    }
+
+    public void updateUserStatus() {
+        this.userStatus = UserStatusEnum.ENABLED;
+        this.authUserAt = LocalDateTime.now();
     }
 }

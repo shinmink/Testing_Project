@@ -56,7 +56,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                         .orElseThrow(UserNotFoundException::new);
 
                 if (isValidateUserAndToken(usercode, findUser, refreshTokenValue)) {
-                    log.info("asdfasfasfasf");
                     //access token 및 refresh token 검증 완료
                     log.info("Token 인증 완료");
                     Claims info = jwtUtil.getUserInfoFromToken(accessTokenValue);

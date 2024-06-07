@@ -21,4 +21,9 @@ public abstract class TimeStampEntity {
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    protected void setDateTimeInit() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
 }

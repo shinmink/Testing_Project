@@ -4,11 +4,15 @@ import com.sparta.wildcard_newsfeed.domain.common.TimeStampEntity;
 import com.sparta.wildcard_newsfeed.domain.post.entity.Post;
 import com.sparta.wildcard_newsfeed.domain.user.entity.User;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class Comment extends TimeStampEntity {
     @Id
@@ -36,5 +40,9 @@ public class Comment extends TimeStampEntity {
 
     public void update(String comment) {
         this.content = comment;
+    }
+
+    public void testDataInit() {
+        super.setDateTimeInit();
     }
 }
