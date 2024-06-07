@@ -8,10 +8,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserSignupResponseDto {
     private String usercode;
-    private String password;
+    private String email;
 
     public UserSignupResponseDto(User user) {
         usercode = user.getUsercode();
-        password = user.getPassword();
+        email = user.getEmail();
     }
 }

@@ -1,10 +1,7 @@
 package com.sparta.wildcard_newsfeed.domain.user.controller;
 
 import com.sparta.wildcard_newsfeed.domain.common.CommonResponseDto;
-import com.sparta.wildcard_newsfeed.domain.user.dto.UserRequestDto;
-import com.sparta.wildcard_newsfeed.domain.user.dto.UserResponseDto;
-import com.sparta.wildcard_newsfeed.domain.user.dto.UserSignupRequestDto;
-import com.sparta.wildcard_newsfeed.domain.user.dto.UserSignupResponseDto;
+import com.sparta.wildcard_newsfeed.domain.user.dto.*;
 import com.sparta.wildcard_newsfeed.domain.user.service.UserService;
 import com.sparta.wildcard_newsfeed.security.AuthenticationUser;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,6 +40,7 @@ public class UserController {
                 .body(CommonResponseDto.<UserSignupResponseDto>builder()
                         .statusCode(HttpStatus.OK.value())
                         .message("회원가입 성공")
+                        .data(responseDto)
                         .build());
     }
 
