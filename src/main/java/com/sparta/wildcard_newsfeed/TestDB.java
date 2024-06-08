@@ -1,6 +1,8 @@
 package com.sparta.wildcard_newsfeed;
 
 import com.sparta.wildcard_newsfeed.domain.comment.entity.Comment;
+import com.sparta.wildcard_newsfeed.domain.liked.entity.ContentsTypeEnum;
+import com.sparta.wildcard_newsfeed.domain.liked.entity.Liked;
 import com.sparta.wildcard_newsfeed.domain.post.entity.Post;
 import com.sparta.wildcard_newsfeed.domain.user.entity.User;
 import com.sparta.wildcard_newsfeed.domain.user.entity.UserRoleEnum;
@@ -78,6 +80,43 @@ public class TestDB {
             // 유저 2의 댓글
             initComments(user2, postList, commentList);
             saveComments(commentList);
+
+            // 사용자 10명을 추가하고 50% 확률로 게시물에 좋아요 추가
+            addLikeToPost(postList);
+        }
+
+        private void addLikeToPost(List<Post> postList) {
+            List<User> userList = createUsers();
+            for (User user : userList) {
+                for (Post post : postList) {
+                    if (Math.random() < 0.5) {
+                        post.setLikeCount(post.getLikeCount() + 1);
+                        Liked liked = new Liked(user, post.getId(), ContentsTypeEnum.POST);
+                        em.persist(post);
+                        em.persist(liked);
+                    }
+                }
+            }
+        }
+
+        private List<User> createUsers() {
+            List<User> userList = new ArrayList<>();
+            for (int i = 0; i < 10; i++) {
+                User user = User.builder()
+                        .usercode("dummyUser" + i)
+                        .password(passwordEncoder.encode("currentPWD999!"))
+                        .name("dummyUser" + i)
+                        .email("test@naver.com")
+                        .introduce("dummyUser" + i)
+                        .userRoleEnum(UserRoleEnum.USER)
+                        .userStatus(UserStatusEnum.UNAUTHORIZED)
+                        .authUserAt(LocalDateTime.now())
+                        .userRoleEnum(UserRoleEnum.USER)
+                        .build();
+                save(user);
+                userList.add(user);
+            }
+            return userList;
         }
 
         private void initPosts(User user, List<Post> postList) {
