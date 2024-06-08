@@ -146,17 +146,15 @@ public class PostService {
         // --- 정렬 방식 ---
         //create  or  liked
         String sortBy = "created_at";
-        if(requestDto.getSortBy().equals("CREATE")){
-            sortBy = "created_at";
-        }
-        else if(requestDto.getSortBy().equals("LIKED")){
-            sortBy = "likecount";
-        }
-        else
+        if (requestDto.getSortBy().equals("CREATE")) {
+            sortBy = "createdAt";
+        } else if (requestDto.getSortBy().equals("LIKED")) {
+            sortBy = "likeCount";
+        } else
             throw new IllegalArgumentException("정렬은 CREATE 또는 LIKED 만 입력 가능합니다.");
 
         Sort sort = Sort.by(direction, sortBy);
-        Pageable pageable = PageRequest.of(requestDto.getPage()-1, requestDto.getSize(), sort);
+        Pageable pageable = PageRequest.of(requestDto.getPage() - 1, requestDto.getSize(), sort);
 
         Page<PostPageResponseDto> postList = null;
 
@@ -177,17 +175,14 @@ public class PostService {
 
         postList = postRepository.findPostPages(firstDate.atStartOfDay().toString(), lastDate.atTime(LocalTime.MAX).toString(), pageable);
 
-        log.error("total page : "+postList.getTotalPages());
-        if(postList.getTotalElements() <= 0){
+        if (postList.getTotalElements() <= 0) {
             log.error("페이지 없음");
             throw new IllegalArgumentException("페이지가 존재하지 않습니다.");
         }
-        if(postList.getTotalPages() < requestDto.getPage() ){
+        if (postList.getTotalPages() < requestDto.getPage()) {
             throw new IllegalArgumentException("유효한 페이지 번호가 아닙니다.");
         }
 
-        //Page<PostResponseDto> responseDtoList = postList.map(PostResponseDto::new);
-        //return responseDtoList;
         return postList;
     }
 }
