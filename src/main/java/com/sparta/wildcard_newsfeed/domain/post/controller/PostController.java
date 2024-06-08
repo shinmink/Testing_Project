@@ -110,7 +110,7 @@ public class PostController {
     })
     public ResponseEntity<CommonResponseDto<PostResponseDto>> updatePost(
             @AuthenticationPrincipal AuthenticationUser user,
-            @Valid @RequestBody PostRequestDto postRequestDto,
+            @Valid @ModelAttribute PostRequestDto postRequestDto,
             @PathVariable Long postId
     ) {
         PostResponseDto postResponseDto = postService.updatePost(postRequestDto, postId, user);

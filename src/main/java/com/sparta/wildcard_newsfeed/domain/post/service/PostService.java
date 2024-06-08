@@ -39,28 +39,13 @@ public class PostService {
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
         Post post = new Post(postRequestDto, byUsercode);
-        List<PostMedia> postMediaList = new ArrayList<>();
-        if (!postRequestDto.getFiles().isEmpty()) {
-            if (postRequestDto.getFiles().size() > 5) {
-                throw new FileException("한 게시물당 최대 5개까지만 저장 가능합니다.");
-            }
-            fileUtils.validFile(postRequestDto.getFiles());
-
-            for (MultipartFile file : postRequestDto.getFiles()) {
-                String s3Url = fileService.uploadFileToS3(file);
-                PostMedia postMedia = new PostMedia();
-                postMedia.setUrl(s3Url);
-                postMedia.setPost(post);
-                postMedia.setType(fileUtils.extractExtension(file.getOriginalFilename()));
-                postMediaList.add(postMedia);
-            }
-        }
         postRepository.save(post);
-        List<String> s3Urls = new ArrayList<>();
-        if (!postMediaList.isEmpty()) {
-            postMediaRepository.saveAll(postMediaList);
-             s3Urls = postMediaList.stream().map(PostMedia::getUrl).toList();
-        }
+
+        List<PostMedia> postMediaList = createPostMediaList(postRequestDto, post);
+        postMediaRepository.saveAll(postMediaList);
+
+        List<String> s3Urls = getS3UrlsFromPostMediaList(postMediaList);
+
         return new PostResponseDto(post, s3Urls);
     }
 
@@ -85,7 +70,14 @@ public class PostService {
 
         post.update(postRequestDto);
         postRepository.save(post);
-        return new PostResponseDto(post);
+
+        List<PostMedia> postMediaList = createPostMediaList(postRequestDto, post);
+        post.getPostMedias().clear();
+        postMediaRepository.saveAll(postMediaList);
+
+        List<String> s3Urls = getS3UrlsFromPostMediaList(postMediaList);
+
+        return new PostResponseDto(post, s3Urls);
     }
 
     @Transactional
@@ -95,6 +87,34 @@ public class PostService {
         validateUser(post, user);
 
         postRepository.delete(post);
+    }
+
+    private List<String> getS3UrlsFromPostMediaList(List<PostMedia> postMediaList) {
+        List<String> s3Urls = new ArrayList<>();
+        if (!postMediaList.isEmpty()) {
+            s3Urls = postMediaList.stream().map(PostMedia::getUrl).toList();
+        }
+        return s3Urls;
+    }
+
+    private List<PostMedia> createPostMediaList(PostRequestDto postRequestDto, Post post) {
+        List<PostMedia> postMediaList = new ArrayList<>();
+        if (!postRequestDto.getFiles().isEmpty()) {
+            if (postRequestDto.getFiles().size() > 5) {
+                throw new FileException("한 게시물당 최대 5개까지만 저장 가능합니다.");
+            }
+            fileUtils.validFile(postRequestDto.getFiles());
+
+            for (MultipartFile file : postRequestDto.getFiles()) {
+                String s3Url = fileService.uploadFileToS3(file);
+                PostMedia postMedia = new PostMedia();
+                postMedia.setUrl(s3Url);
+                postMedia.setPost(post);
+                postMedia.setType(fileUtils.extractExtension(file.getOriginalFilename()));
+                postMediaList.add(postMedia);
+            }
+        }
+        return postMediaList;
     }
 
     private Post findPostById(long id) {
