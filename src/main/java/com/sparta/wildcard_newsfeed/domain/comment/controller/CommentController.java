@@ -37,7 +37,7 @@ public class CommentController {
                         .build());
     }
 
-    @PatchMapping("{commentId}")
+    @PutMapping("{commentId}")
     public ResponseEntity<CommonResponseDto<CommentResponseDto>> updateComment(
             @AuthenticationPrincipal AuthenticationUser user,
             @Valid @RequestBody CommentRequestDto commentRequestDto,

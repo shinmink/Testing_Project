@@ -15,6 +15,7 @@ public class PostResponseDto {
     private List<String> s3Urls;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private Long likeCount;
 
     public PostResponseDto(Post post) {
         this.id = post.getId();
@@ -23,6 +24,7 @@ public class PostResponseDto {
         this.username = post.getUser().getName();
         this.createdAt = post.getCreatedAt();
         this.updatedAt = post.getUpdatedAt();
+        this.likeCount = post.getLikeCount();
     }
 
     public PostResponseDto(Post post, List<String> s3Urls) {
@@ -33,5 +35,6 @@ public class PostResponseDto {
         this.createdAt = post.getCreatedAt();
         this.updatedAt = post.getUpdatedAt();
         this.s3Urls = s3Urls;
+        this.likeCount = post.getLikeCount();
     }
 }
