@@ -1,8 +1,8 @@
 package com.sparta.wildcard_newsfeed.domain.post.service;
 
+import com.sparta.wildcard_newsfeed.domain.file.service.FileService;
 import com.sparta.wildcard_newsfeed.domain.post.dto.PostPageRequestDto;
 import com.sparta.wildcard_newsfeed.domain.post.dto.PostPageResponseDto;
-import com.sparta.wildcard_newsfeed.domain.file.service.FileService;
 import com.sparta.wildcard_newsfeed.domain.post.dto.PostRequestDto;
 import com.sparta.wildcard_newsfeed.domain.post.dto.PostResponseDto;
 import com.sparta.wildcard_newsfeed.domain.post.entity.Post;
@@ -15,7 +15,6 @@ import com.sparta.wildcard_newsfeed.exception.customexception.FileException;
 import com.sparta.wildcard_newsfeed.security.AuthenticationUser;
 import com.sparta.wildcard_newsfeed.util.FileUtils;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,10 +24,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
