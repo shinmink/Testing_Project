@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @RestController
@@ -44,15 +45,19 @@ public class UserController {
                         .build());
     }
 
-    @PostMapping("/resign")
+    @DeleteMapping("/resign")
     @Operation(summary = "회원탈퇴")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "회원탈퇴 성공",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = CommonResponseDto.class)))
     })
-    public ResponseEntity<CommonResponseDto<UserSignupResponseDto>> resign(@Valid @RequestBody UserSignupRequestDto requestDto) {
-        UserSignupResponseDto responseDto = userService.resign(requestDto);
+    public ResponseEntity<CommonResponseDto<UserSignupResponseDto>> resign(
+            @AuthenticationPrincipal AuthenticationUser user,
+            @Valid @RequestParam String password
+    ) {
+        log.info("비밀번호: {}", password);
+        userService.resign(user, password);
 
         return ResponseEntity.ok()
                 .body(CommonResponseDto.<UserSignupResponseDto>builder()
@@ -98,6 +103,28 @@ public class UserController {
                         .statusCode(HttpStatus.OK.value())
                         .message("프로필 수정 성공")
                         .data(userResponseDto)
+                        .build());
+    }
+
+    @PostMapping("/{userId}/profile-image")
+    @Operation(summary = "프로필 사진 업로드")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "프로필 사진 업로드 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CommonResponseDto.class)))
+    })
+    public ResponseEntity<CommonResponseDto<String>> uploadProfileImage(
+            @AuthenticationPrincipal AuthenticationUser loginUser,
+            @PathVariable Long userId,
+            @RequestParam MultipartFile multipartFile
+    ) {
+        String savedS3Url = userService.uploadProfileImage(loginUser, userId, multipartFile);
+
+        return ResponseEntity.ok()
+                .body(CommonResponseDto.<String>builder()
+                        .statusCode(HttpStatus.OK.value())
+                        .message("프로필 사진 업로드 성공")
+                        .data(savedS3Url)
                         .build());
     }
 }

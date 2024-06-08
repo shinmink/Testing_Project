@@ -45,3 +45,21 @@ spring:
           auth: true
           starttls:
             enable: true
+  servlet:
+    multipart:
+      maxFileSize: 300MB # 파일 하나의 최대 크기
+      maxRequestSize: 1000MB  # 한 번에 최대 업로드 가능 용량
+      location: /upload/
+
+# S3
+cloud:
+  aws:
+    s3:
+      bucket: b15wildcard
+    stack:
+      auto: false
+    region:
+      static: ap-northeast-2
+    credentials:
+      access-key: ${S3_ACCESS_KEY}
+      secret-key: ${S3_SECRET_KEY}

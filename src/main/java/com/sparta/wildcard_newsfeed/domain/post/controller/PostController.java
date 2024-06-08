@@ -26,8 +26,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -51,7 +49,7 @@ public class PostController {
     })
     public ResponseEntity<CommonResponseDto<PostResponseDto>> addPost(
             @AuthenticationPrincipal AuthenticationUser user,
-            @Valid @RequestBody PostRequestDto postRequestDto
+            @Valid @ModelAttribute PostRequestDto postRequestDto
     ) {
         PostResponseDto postResponseDto = postService.addPost(postRequestDto, user);
         return ResponseEntity.ok()
@@ -117,7 +115,7 @@ public class PostController {
     })
     public ResponseEntity<CommonResponseDto<PostResponseDto>> updatePost(
             @AuthenticationPrincipal AuthenticationUser user,
-            @Valid @RequestBody PostRequestDto postRequestDto,
+            @Valid @ModelAttribute PostRequestDto postRequestDto,
             @PathVariable Long postId
     ) {
         PostResponseDto postResponseDto = postService.updatePost(postRequestDto, postId, user);

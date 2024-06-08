@@ -5,8 +5,14 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class PostRequestDto {
@@ -18,4 +24,7 @@ public class PostRequestDto {
     @Schema(description = "게시물 내용", example = "내용")
     @NotBlank(message = "내용은 필수 입력 값입니다.")
     private String content;
+
+    @Schema(description = "업로드 파일")
+    private List<MultipartFile> files = new ArrayList<>();
 }

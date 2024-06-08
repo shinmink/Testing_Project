@@ -17,11 +17,14 @@ public class UserResponseDto {
     private String introduce;
     @Schema(description = "사용자 Email")
     private String email;
+    @Schema(description = "프로필 사진 주소")
+    private String profileImageUrl;
 
     public UserResponseDto(User user) {
         this.usercode = user.getUsercode();
         this.name = user.getName();
         this.introduce = user.getIntroduce();
         this.email = user.getEmail();
+        this.profileImageUrl = user.getProfileImageUrl();
     }
 }

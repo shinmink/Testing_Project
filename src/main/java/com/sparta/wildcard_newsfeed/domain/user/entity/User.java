@@ -29,6 +29,9 @@ public class User extends TimeStampEntity {
     @Enumerated(EnumType.STRING)
     private UserRoleEnum userRoleEnum;
 
+    @Setter
+    private String profileImageUrl;
+
     @Builder
     public User(String usercode, String password, String name, String email, String introduce, UserStatusEnum userStatus, LocalDateTime authUserAt, UserRoleEnum userRoleEnum) {
         this.usercode = usercode;

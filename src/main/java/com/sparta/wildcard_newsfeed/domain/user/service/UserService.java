@@ -1,5 +1,6 @@
 package com.sparta.wildcard_newsfeed.domain.user.service;
 
+import com.sparta.wildcard_newsfeed.domain.file.service.FileService;
 import com.sparta.wildcard_newsfeed.domain.user.dto.*;
 import com.sparta.wildcard_newsfeed.domain.user.entity.AuthCodeHistory;
 import com.sparta.wildcard_newsfeed.domain.user.entity.User;
@@ -13,6 +14,9 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Objects;
 
 import static com.sparta.wildcard_newsfeed.domain.user.dto.emailtemplate.EmailTemplate.AUTH_EMAIL;
 
@@ -24,6 +28,7 @@ public class UserService {
     private final AuthCodeService authCodeService;
     private final PasswordEncoder passwordEncoder;
     private final ApplicationEventPublisher eventPublisher;
+    private final FileService fileService;
 
     @Transactional
     public UserSignupResponseDto signup(UserSignupRequestDto requestDto) {
@@ -42,37 +47,37 @@ public class UserService {
         AuthCodeHistory authCodeHistory = authCodeService.addAuthCode(user);
 
         //메일 생성 후 전송
-        eventPublisher.publishEvent(
-                EmailSendEvent.of(AUTH_EMAIL.getSub(), AUTH_EMAIL.formatBody(authCodeHistory.getAutoCode()), user.getEmail())
-        );
+        eventPublisher.publishEvent(EmailSendEvent.of(AUTH_EMAIL.getSub(), AUTH_EMAIL.formatBody(authCodeHistory.getAutoCode()), user.getEmail()));
 
         return new UserSignupResponseDto(user);
     }
 
     @Transactional
-    public UserSignupResponseDto resign(UserSignupRequestDto requestDto) {
-        String usercode = requestDto.getUsercode();
+    public void resign(AuthenticationUser user, String password) {
+        String usercode = user.getUsername();
 
-        User user = userRepository.findByUsercode(usercode)
+        User findUser = userRepository.findByUsercode(usercode)
                 .orElseThrow(() -> new NullPointerException("해당하는 회원이 없습니다!!"));
 
-        if (user.getUserStatus() == UserStatusEnum.DISABLED) {
-            throw new IllegalArgumentException("이미 탈퇴한 사용자입니다!!");
+        if (findUser.getUserStatus() == UserStatusEnum.DISABLED) {
+            throw new IllegalArgumentException("이미 탈퇴한 사용자입니다.");
         }
 
-        if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(password, findUser.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다!!");
         }
 
-        user.setUserStatus(UserStatusEnum.DISABLED);
-
-        return null;
+        findUser.setUserStatus(UserStatusEnum.DISABLED);
     }
 
     @Transactional(readOnly = true)
     public UserResponseDto findById(Long userId) {
         User findUser = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        if (findUser.getUserStatus() == UserStatusEnum.DISABLED) {
+            throw new IllegalArgumentException("이미 탈퇴한 사용자입니다.");
+        }
 
         return new UserResponseDto(findUser);
     }
@@ -81,6 +86,10 @@ public class UserService {
     public UserResponseDto updateUser(AuthenticationUser loginUser, Long userId, UserRequestDto requestDto) {
         User findUser = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        if (findUser.getUserStatus() == UserStatusEnum.DISABLED) {
+            throw new IllegalArgumentException("이미 탈퇴한 사용자입니다.");
+        }
 
         if (requestDto.getPassword() != null) {
             if (requestDto.getChangePassword() == null) {
@@ -93,14 +102,16 @@ public class UserService {
             }
         }
         if (requestDto.getPassword() != null && requestDto.getChangePassword() != null) {
-            if (!loginUser.getPassword().equals(requestDto.getPassword()) || !findUser.getPassword().equals(requestDto.getPassword())) {
-                throw new IllegalArgumentException("사용자가 일치하지 않습니다.");
+            if (!passwordEncoder.matches(requestDto.getPassword(), loginUser.getPassword())
+                    || !passwordEncoder.matches(requestDto.getPassword(), findUser.getPassword())) {
+                throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
             }
             if (requestDto.getPassword().equals(requestDto.getChangePassword())) {
                 throw new IllegalArgumentException("변경하려는 비밀번호와 현재 비밀번호가 같습니다.");
             }
         }
 
+        requestDto.encryptPassword(passwordEncoder.encode(requestDto.getChangePassword()));
         findUser.update(requestDto);
 
         User savedUser = userRepository.save(findUser);
@@ -125,5 +136,21 @@ public class UserService {
 
         authCodeService.findByAutoCode(findUser, requestDto.getAuthCode());
         findUser.updateUserStatus();
+    }
+
+    @Transactional
+    public String uploadProfileImage(AuthenticationUser loginUser, Long userId, MultipartFile multipartFile) {
+        User findUser = userRepository.findByUsercode(loginUser.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        if (!Objects.equals(findUser.getId(), userId)) {
+            throw new IllegalArgumentException("사용자가 일치하지 않습니다.");
+        }
+
+        String s3Url = fileService.uploadFileToS3(multipartFile);
+        log.info("S3에 저장한 파일 주소: {}", s3Url);
+        findUser.setProfileImageUrl(s3Url);
+
+        return s3Url;
     }
 }
