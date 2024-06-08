@@ -72,6 +72,7 @@ public class WebSecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/v1/user/signup").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/user/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/post/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/post/page").permitAll() //게시글 페이지는 로그인x
                 .anyRequest().authenticated()
         );
 

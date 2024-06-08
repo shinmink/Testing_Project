@@ -4,8 +4,11 @@ import com.sparta.wildcard_newsfeed.domain.comment.dto.CommentResponseDto;
 import com.sparta.wildcard_newsfeed.domain.comment.dto.PostWithCommentsResponseDto;
 import com.sparta.wildcard_newsfeed.domain.comment.service.CommentService;
 import com.sparta.wildcard_newsfeed.domain.common.CommonResponseDto;
+import com.sparta.wildcard_newsfeed.domain.post.dto.PostPageRequestDto;
+import com.sparta.wildcard_newsfeed.domain.post.dto.PostPageResponseDto;
 import com.sparta.wildcard_newsfeed.domain.post.dto.PostRequestDto;
 import com.sparta.wildcard_newsfeed.domain.post.dto.PostResponseDto;
+import com.sparta.wildcard_newsfeed.domain.post.repository.PostRepository;
 import com.sparta.wildcard_newsfeed.domain.post.service.PostService;
 import com.sparta.wildcard_newsfeed.security.AuthenticationUser;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,6 +20,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -33,6 +37,7 @@ public class PostController {
 
     private final PostService postService;
     private final CommentService commentService;
+    private final PostRepository postRepository;
 
     // 게시물 등록
     @PostMapping
@@ -139,6 +144,18 @@ public class PostController {
                 .body(CommonResponseDto.<PostResponseDto>builder()
                         .statusCode(HttpStatus.OK.value())
                         .message("게시물 삭제 성공")
+                        .build());
+    }
+
+    //페이지네이션
+    @PostMapping("/page")
+    public ResponseEntity<CommonResponseDto<Page<PostPageResponseDto>>> getPostPage(@Valid @RequestBody PostPageRequestDto requestDto) {
+        Page<PostPageResponseDto> page = postService.getPostPage(requestDto);
+        return ResponseEntity.ok()
+                .body(CommonResponseDto.<Page<PostPageResponseDto>>builder()
+                        .statusCode(HttpStatus.OK.value())
+                        .message("게시물 페이지 조회 성공")
+                        .data(page)
                         .build());
     }
 }
