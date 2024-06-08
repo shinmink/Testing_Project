@@ -1,10 +1,7 @@
 package com.sparta.wildcard_newsfeed.domain.user.controller;
 
 import com.sparta.wildcard_newsfeed.domain.common.CommonResponseDto;
-import com.sparta.wildcard_newsfeed.domain.user.dto.UserRequestDto;
-import com.sparta.wildcard_newsfeed.domain.user.dto.UserResponseDto;
-import com.sparta.wildcard_newsfeed.domain.user.dto.UserSignupRequestDto;
-import com.sparta.wildcard_newsfeed.domain.user.dto.UserSignupResponseDto;
+import com.sparta.wildcard_newsfeed.domain.user.dto.*;
 import com.sparta.wildcard_newsfeed.domain.user.service.UserService;
 import com.sparta.wildcard_newsfeed.security.AuthenticationUser;
 import io.swagger.v3.oas.annotations.Operation;
@@ -48,15 +45,19 @@ public class UserController {
                         .build());
     }
 
-    @PostMapping("/resign")
+    @DeleteMapping("/resign")
     @Operation(summary = "회원탈퇴")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "회원탈퇴 성공",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = CommonResponseDto.class)))
     })
-    public ResponseEntity<CommonResponseDto<UserSignupResponseDto>> resign(@Valid @RequestBody UserSignupRequestDto requestDto) {
-        UserSignupResponseDto responseDto = userService.resign(requestDto);
+    public ResponseEntity<CommonResponseDto<UserSignupResponseDto>> resign(
+            @AuthenticationPrincipal AuthenticationUser user,
+            @Valid @RequestParam String password
+    ) {
+        log.info("비밀번호: {}", password);
+        userService.resign(user, password);
 
         return ResponseEntity.ok()
                 .body(CommonResponseDto.<UserSignupResponseDto>builder()

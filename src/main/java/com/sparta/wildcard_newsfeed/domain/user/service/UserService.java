@@ -53,29 +53,31 @@ public class UserService {
     }
 
     @Transactional
-    public UserSignupResponseDto resign(UserSignupRequestDto requestDto) {
-        String usercode = requestDto.getUsercode();
+    public void resign(AuthenticationUser user, String password) {
+        String usercode = user.getUsername();
 
-        User user = userRepository.findByUsercode(usercode)
+        User findUser = userRepository.findByUsercode(usercode)
                 .orElseThrow(() -> new NullPointerException("해당하는 회원이 없습니다!!"));
 
-        if (user.getUserStatus() == UserStatusEnum.DISABLED) {
-            throw new IllegalArgumentException("이미 탈퇴한 사용자입니다!!");
+        if (findUser.getUserStatus() == UserStatusEnum.DISABLED) {
+            throw new IllegalArgumentException("이미 탈퇴한 사용자입니다.");
         }
 
-        if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(password, findUser.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다!!");
         }
 
-        user.setUserStatus(UserStatusEnum.DISABLED);
-
-        return null;
+        findUser.setUserStatus(UserStatusEnum.DISABLED);
     }
 
     @Transactional(readOnly = true)
     public UserResponseDto findById(Long userId) {
         User findUser = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        if (findUser.getUserStatus() == UserStatusEnum.DISABLED) {
+            throw new IllegalArgumentException("이미 탈퇴한 사용자입니다.");
+        }
 
         return new UserResponseDto(findUser);
     }
@@ -84,6 +86,10 @@ public class UserService {
     public UserResponseDto updateUser(AuthenticationUser loginUser, Long userId, UserRequestDto requestDto) {
         User findUser = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        if (findUser.getUserStatus() == UserStatusEnum.DISABLED) {
+            throw new IllegalArgumentException("이미 탈퇴한 사용자입니다.");
+        }
 
         if (requestDto.getPassword() != null) {
             if (requestDto.getChangePassword() == null) {
