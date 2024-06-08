@@ -98,16 +98,14 @@ public class UserService {
         if (requestDto.getPassword() != null && requestDto.getChangePassword() != null) {
             if (!passwordEncoder.matches(requestDto.getPassword(), loginUser.getPassword())
                     || !passwordEncoder.matches(requestDto.getPassword(), findUser.getPassword())) {
-                log.error("로그인 한 유저 비밀번호:{}", loginUser.getPassword());
-                log.error("변경할 비밀번호: {}", findUser.getPassword());
-                log.error("현재 입력한 비밀번호: {}", requestDto.getPassword());
-                throw new IllegalArgumentException("사용자가 일치하지 않습니다.");
+                throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
             }
             if (requestDto.getPassword().equals(requestDto.getChangePassword())) {
                 throw new IllegalArgumentException("변경하려는 비밀번호와 현재 비밀번호가 같습니다.");
             }
         }
 
+        requestDto.encryptPassword(passwordEncoder.encode(requestDto.getChangePassword()));
         findUser.update(requestDto);
 
         User savedUser = userRepository.save(findUser);
