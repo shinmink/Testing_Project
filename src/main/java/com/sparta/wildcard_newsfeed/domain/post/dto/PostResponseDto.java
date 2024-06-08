@@ -1,5 +1,6 @@
 package com.sparta.wildcard_newsfeed.domain.post.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sparta.wildcard_newsfeed.domain.post.entity.Post;
 import lombok.Getter;
 
@@ -13,7 +14,9 @@ public class PostResponseDto {
     private String content;
     private String username;
     private List<String> s3Urls;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
     private Long likeCount;
 
