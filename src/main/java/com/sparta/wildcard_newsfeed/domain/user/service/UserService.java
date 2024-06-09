@@ -139,7 +139,7 @@ public class UserService {
     }
 
     @Transactional
-    public String uploadProfileImage(AuthenticationUser loginUser, Long userId, MultipartFile multipartFile) {
+    public String uploadProfileImage(AuthenticationUser loginUser, Long userId, MultipartFile file) {
         User findUser = userRepository.findByUsercode(loginUser.getUsername())
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
@@ -147,7 +147,7 @@ public class UserService {
             throw new IllegalArgumentException("사용자가 일치하지 않습니다.");
         }
 
-        String s3Url = fileService.uploadFileToS3(multipartFile);
+        String s3Url = fileService.uploadFileToS3(file);
         log.info("S3에 저장한 파일 주소: {}", s3Url);
         findUser.setProfileImageUrl(s3Url);
 

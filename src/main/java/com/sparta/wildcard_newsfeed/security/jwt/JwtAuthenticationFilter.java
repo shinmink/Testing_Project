@@ -13,16 +13,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 
-import static com.sparta.wildcard_newsfeed.security.jwt.JwtConstants.*;
+import static com.sparta.wildcard_newsfeed.security.jwt.JwtConstants.ACCESS_TOKEN_HEADER;
+import static com.sparta.wildcard_newsfeed.security.jwt.JwtConstants.REFRESH_TOKEN_HEADER;
 
 @Slf4j(topic = "로그인 및 JWT 생성")
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -31,8 +30,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     private final UserRepository userRepository;
 
 
-    public JwtAuthenticationFilter(ObjectMapper objectMapper, JwtUtil jwtUtil,
-                                   UserRepository userRepository
+    public JwtAuthenticationFilter(ObjectMapper objectMapper, JwtUtil jwtUtil, UserRepository userRepository
     ) {
         this.objectMapper = objectMapper;
         this.jwtUtil = jwtUtil;
@@ -74,8 +72,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     }
 
 
-    private void loginSuccessResponse(HttpServletResponse response, TokenDto tokenDto)
-            throws IOException {
+    private void loginSuccessResponse(HttpServletResponse response, TokenDto tokenDto) throws IOException {
         CommonResponseDto responseDto = CommonResponseDto.builder()
                 .message("로그인 성공")
                 .statusCode(HttpStatus.OK.value())
@@ -104,6 +101,4 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         response.setContentType("application/json;charset=UTF-8");
         response.getWriter().write(body);
     }
-
-
 }

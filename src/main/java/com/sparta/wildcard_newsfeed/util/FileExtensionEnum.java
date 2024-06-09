@@ -14,7 +14,6 @@ public enum FileExtensionEnum {
 
     private final String[] extensions;
 
-    /*                가변인자*/
     FileExtensionEnum(String... extensions) {
         this.extensions = extensions;
     }

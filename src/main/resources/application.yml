@@ -27,7 +27,7 @@ logging.level:
 #  org.springframework.web: debug
 
 jwt:
-  secret-key : ${JWT-SECRET-KEY}
+  secret-key: ${JWT-SECRET-KEY}
 
 server:
   port: ${SERVER_PORT}

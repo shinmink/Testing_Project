@@ -41,5 +41,4 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         response.setStatus(statusCode);
         response.getWriter().write(body);
     }
-
 }

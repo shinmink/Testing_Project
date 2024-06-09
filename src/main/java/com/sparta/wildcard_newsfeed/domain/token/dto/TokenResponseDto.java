@@ -1,7 +1,6 @@
 package com.sparta.wildcard_newsfeed.domain.token.dto;
 
 import com.sparta.wildcard_newsfeed.domain.user.dto.UserResponseFromTokenDto;
-import com.sparta.wildcard_newsfeed.domain.user.entity.User;
 import com.sparta.wildcard_newsfeed.security.jwt.dto.TokenDto;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,5 +19,4 @@ public class TokenResponseDto {
                 .refreshToken(tokenDto.getRefreshToken())
                 .build();
     }
-
 }

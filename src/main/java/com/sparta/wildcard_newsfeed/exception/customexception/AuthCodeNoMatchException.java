@@ -8,4 +8,3 @@ public class AuthCodeNoMatchException extends RuntimeException {
         super("일치하지 않는 인증 번호입니다.");
     }
 }
-

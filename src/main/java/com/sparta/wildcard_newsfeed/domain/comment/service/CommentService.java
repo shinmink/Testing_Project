@@ -35,7 +35,7 @@ public class CommentService {
 
         // DB에 게시물이 존재하지 않는 경우
         Post post = findPostById(postId);
-        Comment comment = commentRepository.save(new Comment(request.getComment(), byUsercode, post));
+        Comment comment = commentRepository.save(new Comment(request.getContent(), byUsercode, post));
         return new CommentResponseDto(comment);
     }
 
@@ -50,7 +50,7 @@ public class CommentService {
             throw new IllegalArgumentException("작성자만 수정할 수 있습니다.");
         }
 
-        comment.update(request.getComment());
+        comment.update(request.getContent());
         commentRepository.save(comment);
         return new CommentResponseDto(comment);
     }

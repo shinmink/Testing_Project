@@ -8,16 +8,16 @@ import java.time.LocalDateTime;
 
 @Getter
 public class CommentResponseDto {
+    private Long postId;
     private Long id;
     private String content;
     private String username;
-    private Long likeCount;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
-    private Long postId;
+    private Long likeCount;
 
     public CommentResponseDto(Comment comment) {
         this.id = comment.getId();

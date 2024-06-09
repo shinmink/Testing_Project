@@ -58,6 +58,7 @@ public class JwtUtil {
                         .signWith(key, signatureAlgorithm) // 암호화 알고리즘
                         .compact();
     }
+
     // refresh Token 생성
     public String createRefreshToken(String username) {
         Date date = new Date();

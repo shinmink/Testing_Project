@@ -1,7 +1,10 @@
 package com.sparta.wildcard_newsfeed.domain.user.controller;
 
 import com.sparta.wildcard_newsfeed.domain.common.CommonResponseDto;
-import com.sparta.wildcard_newsfeed.domain.user.dto.*;
+import com.sparta.wildcard_newsfeed.domain.user.dto.UserRequestDto;
+import com.sparta.wildcard_newsfeed.domain.user.dto.UserResponseDto;
+import com.sparta.wildcard_newsfeed.domain.user.dto.UserSignupRequestDto;
+import com.sparta.wildcard_newsfeed.domain.user.dto.UserSignupResponseDto;
 import com.sparta.wildcard_newsfeed.domain.user.service.UserService;
 import com.sparta.wildcard_newsfeed.security.AuthenticationUser;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,6 +21,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -54,10 +59,9 @@ public class UserController {
     })
     public ResponseEntity<CommonResponseDto<UserSignupResponseDto>> resign(
             @AuthenticationPrincipal AuthenticationUser user,
-            @Valid @RequestParam String password
+            @Valid @RequestBody Map<String, String> map
     ) {
-        log.info("비밀번호: {}", password);
-        userService.resign(user, password);
+        userService.resign(user, map.get("password"));
 
         return ResponseEntity.ok()
                 .body(CommonResponseDto.<UserSignupResponseDto>builder()
@@ -116,9 +120,9 @@ public class UserController {
     public ResponseEntity<CommonResponseDto<String>> uploadProfileImage(
             @AuthenticationPrincipal AuthenticationUser loginUser,
             @PathVariable Long userId,
-            @RequestParam MultipartFile multipartFile
+            @RequestParam MultipartFile file
     ) {
-        String savedS3Url = userService.uploadProfileImage(loginUser, userId, multipartFile);
+        String savedS3Url = userService.uploadProfileImage(loginUser, userId, file);
 
         return ResponseEntity.ok()
                 .body(CommonResponseDto.<String>builder()

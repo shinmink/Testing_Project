@@ -2,11 +2,8 @@ package com.sparta.wildcard_newsfeed.domain.token.service;
 
 import com.sparta.wildcard_newsfeed.domain.token.dto.TokenResponseDto;
 import com.sparta.wildcard_newsfeed.domain.user.dto.UserResponseFromTokenDto;
-import com.sparta.wildcard_newsfeed.domain.user.entity.User;
-import com.sparta.wildcard_newsfeed.domain.user.repository.UserRepository;
 import com.sparta.wildcard_newsfeed.domain.user.service.UserService;
 import com.sparta.wildcard_newsfeed.exception.customexception.TokenNotFoundException;
-import com.sparta.wildcard_newsfeed.exception.customexception.UserNotFoundException;
 import com.sparta.wildcard_newsfeed.security.jwt.JwtUtil;
 import com.sparta.wildcard_newsfeed.security.jwt.dto.TokenDto;
 import jakarta.servlet.http.HttpServletRequest;

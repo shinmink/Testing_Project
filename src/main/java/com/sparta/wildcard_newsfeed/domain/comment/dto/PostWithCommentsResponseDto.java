@@ -16,5 +16,4 @@ public class PostWithCommentsResponseDto {
         this.post = post;
         this.comments = comments;
     }
-
 }

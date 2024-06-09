@@ -22,6 +22,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "left join user u on u.id = p.user_id " +
             "where p.created_at between :startDate AND :endDate ", nativeQuery = true)
     Page<PostPageResponseDto> findPostPages(@Param("startDate") String startDate,
-                                           @Param("endDate") String endDate,
-                                           Pageable pageable);
+                                            @Param("endDate") String endDate,
+                                            Pageable pageable);
 }

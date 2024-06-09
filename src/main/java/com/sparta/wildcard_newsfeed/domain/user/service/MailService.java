@@ -17,10 +17,10 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @Service
 @RequiredArgsConstructor
 public class MailService {
+
     private final JavaMailSender javaMailSender;
 
     private static final String SENDER_EMAIL = "b15wildcard@gmail.com";
-
 
     @Async
     @TransactionalEventListener

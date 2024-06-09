@@ -54,6 +54,4 @@ public class TokenController {
                 .body(commonResponseDto);
 
     }
-
-
 }

@@ -57,7 +57,6 @@ public class AuthCodeService {
         if (findAuthCode.getExpireDate().isBefore(LocalDateTime.now())) {
             throw new AuthCodeExpireException();
         }
-
     }
 
     /**

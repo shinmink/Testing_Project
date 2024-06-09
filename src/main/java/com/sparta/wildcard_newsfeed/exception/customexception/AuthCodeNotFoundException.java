@@ -8,4 +8,3 @@ public class AuthCodeNotFoundException extends RuntimeException {
         super("찾을 수 없는 인증 번호입니다.");
     }
 }
-

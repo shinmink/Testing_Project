@@ -2,14 +2,10 @@ package com.sparta.wildcard_newsfeed.domain.post.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import java.time.LocalDate;
 
 @Getter
 @NoArgsConstructor
@@ -29,12 +25,9 @@ public class PostPageRequestDto {
     private String sortBy; // 생성일자 최신순 or 좋아요 많은 순
 
     @Schema(description = "검색 기간 시작일", example = "2024-05-01")
-    //@NotNull(message = "검색 기간 시작일 필수 입력 값입니다.")
     private String firstDate; // 생성일자 최신순 or 좋아요 많은 순
 
     @Schema(description = "검색 기간 마지막일", example = "2024-05-27")
-    //@NotNull(message = "검색 기간 마지막일 필수 입력 값입니다.")
-    //@PastOrPresent(message = "미래를 지정할 수 없습니다.")
     private String lastDate; // 생성일자 최신순 or 좋아요 많은 순
 
     /*

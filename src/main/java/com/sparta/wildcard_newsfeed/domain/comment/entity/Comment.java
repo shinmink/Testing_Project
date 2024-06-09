@@ -37,7 +37,6 @@ public class Comment extends TimeStampEntity {
         this.likeCount = 0L;
     }
 
-
     public void update(String comment) {
         this.content = comment;
     }

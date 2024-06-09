@@ -1,6 +1,5 @@
 package com.sparta.wildcard_newsfeed.security.jwt;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.wildcard_newsfeed.domain.user.entity.User;
 import com.sparta.wildcard_newsfeed.domain.user.repository.UserRepository;
 import com.sparta.wildcard_newsfeed.exception.customexception.TokenNotFoundException;
@@ -12,15 +11,12 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -32,8 +28,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private final AuthenticationUserService authenticationUserService;
     private final UserRepository userRepository;
 
-    public JwtAuthorizationFilter(JwtUtil jwtUtil, AuthenticationUserService authenticationUserService,
-                                  UserRepository userRepository) {
+    public JwtAuthorizationFilter(JwtUtil jwtUtil, AuthenticationUserService authenticationUserService, UserRepository userRepository) {
         this.jwtUtil = jwtUtil;
         this.authenticationUserService = authenticationUserService;
         this.userRepository = userRepository;
@@ -41,12 +36,10 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain) throws ServletException, IOException {
-
         String accessTokenValue = jwtUtil.getAccessTokenFromHeader(req);
 
         log.info("access token 검증");
         if (StringUtils.hasText(accessTokenValue) && jwtUtil.validateToken(req, accessTokenValue)) {
-
             log.info("refresh token 검증");
 
             String refreshTokenValue = jwtUtil.getRefreshTokenFromHeader(req);
@@ -65,9 +58,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 log.error("유효하지 않는 Refersh Token");
                 throw new TokenNotFoundException("토큰에 문제가 생김");
             }
-
         }
-
         filterChain.doFilter(req, res);
     }
 

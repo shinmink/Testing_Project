@@ -23,7 +23,7 @@ public class EmailExceptionControllerAdvice {
      */
     @ExceptionHandler(AuthCodeExpireException.class)
     public ResponseEntity<ErrorResponseDto> authCodeExpireException(AuthCodeExpireException e) {
-        log.info("AuthCodeExpireException {}" , e.getClass().getSimpleName());
+        log.info("AuthCodeExpireException {}", e.getClass().getSimpleName());
         log.error("{} ", e.getMessage());
 
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
@@ -38,7 +38,7 @@ public class EmailExceptionControllerAdvice {
      */
     @ExceptionHandler(AuthCodeNoMatchException.class)
     public ResponseEntity<ErrorResponseDto> authCodeNoMatchException(AuthCodeNoMatchException e) {
-        log.info("AuthCodeNoMatchException {}" , e.getClass().getSimpleName());
+        log.info("AuthCodeNoMatchException {}", e.getClass().getSimpleName());
         log.error("{} ", e.getClass().getSimpleName());
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -53,7 +53,7 @@ public class EmailExceptionControllerAdvice {
      */
     @ExceptionHandler(AuthCodeNotFoundException.class)
     public ResponseEntity<ErrorResponseDto> authCodeNotFoundException(AuthCodeNotFoundException e) {
-        log.info("AuthCodeNotFoundException {}" , e.getClass().getSimpleName());
+        log.info("AuthCodeNotFoundException {}", e.getClass().getSimpleName());
         log.error("{} ", e.getClass().getSimpleName());
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -62,5 +62,4 @@ public class EmailExceptionControllerAdvice {
                         .message(e.getMessage())
                         .build());
     }
-
 }

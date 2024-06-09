@@ -144,7 +144,7 @@ public class PostService {
         //- 생성일자 기준 최신 - 좋아요 많은 순
 
         // --- 정렬 방식 ---
-        //create  or  liked
+        //CREATE  or  LIKED
         String sortBy = "created_at";
         if (requestDto.getSortBy().equals("CREATE")) {
             sortBy = "createdAt";

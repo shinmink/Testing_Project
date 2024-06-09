@@ -35,5 +35,4 @@ public class JwtLogoutSuccessHandler implements LogoutSuccessHandler {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.getWriter().write(body);
     }
-
 }
