@@ -149,6 +149,12 @@ public class PostController {
 
     //페이지네이션
     @PostMapping("/page")
+    @Operation(summary = "페이징")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "페이징 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CommonResponseDto.class)))
+    })
     public ResponseEntity<CommonResponseDto<Page<PostPageResponseDto>>> getPostPage(@Valid @RequestBody PostPageRequestDto requestDto) {
         Page<PostPageResponseDto> page = postService.getPostPage(requestDto);
         return ResponseEntity.ok()

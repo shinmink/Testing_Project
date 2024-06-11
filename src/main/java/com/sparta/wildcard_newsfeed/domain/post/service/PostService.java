@@ -59,7 +59,10 @@ public class PostService {
 
     public PostResponseDto findById(long id) {
         Post post = findPostById(id);
-        return new PostResponseDto(post);
+
+        List<String> s3Urls = getS3UrlsFromPostMediaList(postMediaRepository.findByPostId(id));
+
+        return new PostResponseDto(post, s3Urls);
     }
 
     public List<PostResponseDto> findAll() {

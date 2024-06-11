@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -26,5 +25,5 @@ public class PostRequestDto {
     private String content;
 
     @Schema(description = "업로드 파일")
-    private List<MultipartFile> files = new ArrayList<>();
+    private List<MultipartFile> files;
 }

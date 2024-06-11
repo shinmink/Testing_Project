@@ -11,7 +11,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 public class PostPageRequestDto {
-    @Schema(description = "선택 페이지", example = "0")
+    @Schema(description = "선택 페이지", example = "1")
     @NotNull(message = "선택 페이지 필수 입력 값입니다.")
     @Positive(message = "0이 아닌 양수만 가능합니다.")
     private int page; // 현재 페이지 0부터 시작

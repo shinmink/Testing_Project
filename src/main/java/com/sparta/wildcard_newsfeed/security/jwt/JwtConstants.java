@@ -8,6 +8,8 @@ public class JwtConstants {
     // Token 식별자
     public static final String BEARER_PREFIX = "Bearer ";
     // 토큰 만료시간
-    public static final long ACCESS_TOKEN_TIME = 1000 * 60 * 30; // 30분
+    public static final long ACCESS_TOKEN_TIME = 1000 * 60 * 30 * 60; // 30분
+//    public static final long ACCESS_TOKEN_TIME = 1000 * 30; // 30초
     public static final long REFRESH_TOKEN_TIME = 1000 * 60 * 60 * 24 * 14; // 2주
+//    public static final long REFRESH_TOKEN_TIME = 1000 * 60; // 60초
 }

@@ -91,6 +91,10 @@ public class UserService {
             throw new IllegalArgumentException("이미 탈퇴한 사용자입니다.");
         }
 
+        if (!Objects.equals(findUser.getUsercode(), loginUser.getUsername())) {
+            throw new IllegalArgumentException("사용자가 다릅니다.");
+        }
+
         if (requestDto.getPassword() != null) {
             if (requestDto.getChangePassword() == null) {
                 throw new IllegalArgumentException("변경할 비밀번호을 입력해 주세요.");
