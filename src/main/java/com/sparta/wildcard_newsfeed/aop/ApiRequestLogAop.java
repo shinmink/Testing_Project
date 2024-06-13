@@ -3,7 +3,7 @@ package com.sparta.wildcard_newsfeed.aop;
 import com.sparta.wildcard_newsfeed.domain.user.entity.User;
 import com.sparta.wildcard_newsfeed.domain.user.repository.UserRepository;
 import com.sparta.wildcard_newsfeed.security.AuthenticationUser;
-import com.sparta.wildcard_newsfeed.security.AuthenticationUserService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -13,12 +13,14 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
-@Slf4j(topic = "UseTimeAop")
+@Slf4j(topic = "ApiRequestLog")
 @Aspect
 @Component
 @RequiredArgsConstructor
-public class UseTimeAop {
+public class ApiRequestLogAop {
 
     private final ApiUseTimeRepository apiUseTimeRepository;
     private final UserRepository userRepository;
@@ -36,9 +38,16 @@ public class UseTimeAop {
     @Pointcut("execution(* com.sparta.wildcard_newsfeed.domain.user.controller.EmailController.*(..))")
     private void email() {}
 
-
     @Around("comment() || liked() || post() || token() || user() || email()")
-    public Object execute(ProceedingJoinPoint joinPoint) throws Throwable {
+    public Object logRequestDetails(ProceedingJoinPoint joinPoint) throws Throwable {
+        // 현재 요청의 HttpServletRequest를 가져옴
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+
+        // 요청 URL과 HTTP 메서드 로그 출력
+        String requestUrl = request.getRequestURL().toString();
+        String httpMethod = request.getMethod();
+        log.info("Request URL: {}, HTTP Method: {}", requestUrl, httpMethod);
+
         // 측정 시작 시간
         long startTime = System.currentTimeMillis();
 
@@ -60,7 +69,7 @@ public class UseTimeAop {
                 User loginUser = userRepository.findByUsercode(authenticationUser.getUsername())
                         .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-                // API 사용시간 및 DB 에 기록
+                // API 사용시간 및 DB에 기록
                 ApiUseTime apiUseTime = apiUseTimeRepository.findByUser(loginUser).orElse(null);
                 if (apiUseTime == null) {
                     // 로그인 회원의 기록이 없으면
