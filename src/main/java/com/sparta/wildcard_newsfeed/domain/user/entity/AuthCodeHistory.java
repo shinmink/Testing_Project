@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Entity
 
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 public class AuthCodeHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
