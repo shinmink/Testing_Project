@@ -164,7 +164,7 @@ public class UserService {
     /**
      * Auto 생성
      */
-    private String createAuthCode() {
+    public String createAuthCode() {
         return UUID.randomUUID().toString();
     }
 }
